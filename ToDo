@@ -64,11 +64,12 @@ bison -v analysesynt.y
 	<division> ::= <expression> "/" <expression>
 
 	<instruction>::=<affectation> | <expression> ";"|<bloc>|"return" ";"|// nom ":=" <expresssion> ";"// deja correspondant avec les expressions | "if" <expression> "then" <instruction> "else" <instruction>
-	<bloc>::="{" <listinstructions> "}"|"{" <listdeclaration> "is" <listinstruction> "}" 
+	<bloc>::="{" <listinstructionsOpt> "}"|"{" <listdeclaration> "is" <listinstruction> "}" 
 	<declarationvar>::=nom ":" nomClasse [":=" <expression>] ";"
 	<affectation>::=(<indent>|nom) ":=" <expression>
 	<listdeclarationvar>::=<declarationvar> <listdeclarationvar>|<none>
-	<listinstructions>::=<instruction> <listinstructions>|<none>
+	<listinstructionsOpt>::=<instruction> <listinstructions>|<none>
+    <listinstructions>::=<instruction> <listinstructions>
 
 //CHANGER TOUS LES nom en identval et les nomClasse en identclass
 //REMETTRE A JOUR AVEC CE QUE J'AI MIS DANS LE FICHIER
@@ -90,6 +91,7 @@ triés par prio:
 "-" "+"
 "*" "/" "&"
 "(" ")" 
+
 
 Liste des choses à vérifier dans l'analyse sémentique (il y en a d'autres):
 vérifier que classe existe à l'appel
