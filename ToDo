@@ -1,0 +1,128 @@
+analyse lexicale TERMINE 
+analyse syntaxique TERMINE
+analyse sementique A FAIRE
+
+Liste des commandes.
+
+PART1
+flex -o analyselex.c analyselex.lex
+gcc -o analyselex analyselex.c
+./analyselex < ex1.txt
+
+PART2
+flex -o analyselex.c analyselex.lex
+bison -d analysesynt.y
+gcc -o simple analyselex.c analysesynt.tab.c
+
+pour avoir les infos des états (normalement pas besoin car syntaxique ok) dans analysesynt.output  
+bison -v analysesynt.y
+
+
+
+
+
+
+	<axiome>::=[<listclasse>] <bloc>|<none>
+	<listclasse>::=<declclasse> <listclasse>|<declclasse> 
+
+	<declclasse>::="class" nomClasse "(" <listparamclass> ")" ["extends" nomClasse] "is" "{" <interieurclasse> "}"
+	<interieurclasse>::=<declattribut> <interieurclasse>|<declmethode> <interieurclasse>|<declconstructeur> <interieurclasse>|<none>
+	<declconstructeur>::="def" nomClasse "(" <listparamclass> ")" [":" nomClasse "(" <listargs> ")"] "is" <bloc>
+	<listparamclass>::=<paramclass> ("," <listparamclass>|<none>)|<none>
+	<paramclass>::=["var"] nom ":" nomClasse
+	<declattribut>::="var" ["static"] nom ":" nomClasse ";"|"var" ["static"] nom ":" nomClasse ":=" expression ";"
+	<declmethode>::="def" staticoverideoption nom "(" <listparammethod> ")" ":" nomClasse ":=" <expression>
+	<declmethode>::="def" staticoverideoption nom "(" <listparammethod> ")" [":" nomClasse ] "is" <bloc>
+	<staticoverideoption>::= "static"|"override"|"static""override"|<none>
+
+	<listparammethod>::=<parammethod> ("," <listparammethod>|<none>)|<none>
+	<parammethod>::=nom ":" nomClasse
+	<listargs>::=<expression> ("," <expression>|<none>)|<none>
+
+	<expression>::=<ident>|<const>|"(" "as" nomClasse ":" <expression>")"|"("<expression>")"|<selection>|<instantiation>|<envoimsg>|<expwithop>
+	<identclass>::="this"|"super"|nomClasse
+	<identval>::=nom|"result"
+	<selection>::=<expression> "." nom
+	<const>::=nombre|chainecarac
+	<instantiation>::= "new" nomClasse "(" <listargs> ")"
+	<envoimsg>::=expression "." nom "(" <listargs> ")"
+
+
+	<expwithop> ::=<superieur> | <inferieur> | <egalite> | <nonegalite> | <concat> | <moinsunaire> |<plusunaire>| <addition> | <soustraction> | <multiplication> | <division> | "(" <expwithop> ")"
+	<concat>::=<expression> "&" <expression>
+	<nonegalite>::=<expression> "<>" <expression>
+	<egalite>::=<expression> "=" <expression>
+	<moinsunaire>::="-" <expression>
+	<plusunaire>::="+" <expression>
+	<addition> ::= <expression> "+" <expression> 
+	<soustraction> ::= <expression> "-" <expression>	
+	<multiplication> ::= <expression> "*" <expression>
+	<superieur> ::= <expression> ">" <expression> 
+	<inferieur> ::= <expression> "<" <expression> 
+	<superieuregal> ::= <expression> ">=" <expression> 
+	<inferieuregal> ::= <expression> "<=" <expression> 
+	<division> ::= <expression> "/" <expression>
+
+	<instruction>::=<affectation> | <expression> ";"|<bloc>|"return" ";"|// nom ":=" <expresssion> ";"// deja correspondant avec les expressions | "if" <expression> "then" <instruction> "else" <instruction>
+	<bloc>::="{" <listinstructions> "}"|"{" <listdeclaration> "is" <listinstruction> "}" 
+	<declarationvar>::=nom ":" nomClasse [":=" <expression>] ";"
+	<affectation>::=(<indent>|nom) ":=" <expression>
+	<listdeclarationvar>::=<declarationvar> <listdeclarationvar>|<none>
+	<listinstructions>::=<instruction> <listinstructions>|<none>
+
+//CHANGER TOUS LES nom en identval et les nomClasse en identclass
+//REMETTRE A JOUR AVEC CE QUE J'AI MIS DANS LE FICHIER
+
+
+liste des terminaux
+"<" ">" "class" "(" ")" "extends" "is" "{" "}" "def" ":" "," "var" ";" "static" "override" ":=" "this" "super" "result" "." "new" "&" "<>" "=" "-" "+" "*" "/" "return" "if" "then" "else"  "as"
+nom nomClasse nombre chainecarac
+
+Virer la partie fonction et en refaire une propre
+
+
+liste des opérateurs:
+triés par prio:
+"."
+":="
+"<>" "="
+"<" ">"
+"-" "+"
+"*" "/" "&"
+"(" ")" 
+
+Liste des choses à vérifier dans l'analyse sémentique (il y en a d'autres):
+vérifier que classe existe à l'appel
+verifier que méthode existe dans l'appel
+vérifier que la variable existe dans la portée
+vérifier que l'appel de la méthode correspond bien (cas méthode rédéfinie sous classe)
+prendre en compte le cas de la super classe
+gérer les classes prédéfinies
+vérifier types pour les opérations
+respecter les portées des variables
+méthode ne peut acceder qu'à ses paramettres données pas à deux de la classe par ex
+méthode peux quand même aux attributs de classe (static)
+
+Pour les variables
+structure avec valeur et type
+dans une table de hashage avec pour clée le nom de variable
+Penser au result
+
+Pour les méthodes et classes
+structure avec la liste des méthodes
+dans une table de hashage avec pour clée le nom de la classe.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
