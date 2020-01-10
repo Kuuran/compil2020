@@ -5,26 +5,25 @@
 bool erreursyntx=false;
 extern int lineno;
 extern bool erreurlex;
-bool erreursem = false;
 
 %}
 
 %union {
 	long nombre;
-	char* texte;
+	char* chainecarac;
 
 }
 
 
 
 
-%right TOK_AFFECTATION
+
 %left TOK_DIFFERENCE	TOK_EGALITE
 %left TOK_INFERIEUR	TOK_SUPERIEUR	TOK_INFERIEUREGAL	TOK_SUPERIEUREGAL
 %left TOK_PLUS	TOK_MOINS
-%left TOK_FOIS	TOK_DIVISION	  TOK_CONCAT
+%left TOK_FOIS	TOK_DIVISION TOK_CONCAT
 %nonassoc TOK_POINT
-%right TOK_PARENTHESED    TOK_PARENTHESEG
+
 
  
 
@@ -66,14 +65,18 @@ bool erreursem = false;
 %type<texte>   affectation	
 %type<texte>   listdeclarationvar
 %type<texte>   listinstructions	
-%type<texte>    identinstance //this et super  TODO wtf c'est la merde faut que je fasse rentrer this et super dans la grammaire
+%type<texte>   listinstructionsOpt
 
 
 %token<texte> TOK_CHAINECARAC
 %token<texte> TOK_NOMCLASSE
 %token<texte> TOK_NOM
-%token<nombre> TOK_NOMBRE
+%token<texte> TOK_NOMBRE
+%token TOK_AFFECTATION
+%token TOK_PARENTHESED
+%token TOK_PARENTHESEG
 %token TOK_CLASS
+%token TOK_CONCAT
 %token TOK_EXTENDS
 %token TOK_IS
 %token TOK_CROCHETG
@@ -105,10 +108,9 @@ axiome:		%empty{}
 		|
 		bloc{printf("Bloc\n\n");}
 		|
-		axiome error{ //todo est-ce que c'est utile/valide?
+		axiome error{
 			erreursyntx=true;
                         fprintf(stderr,"\tERREUR : Erreur de syntaxe a la ligne %d.\n",lineno);
-                        erreursem=true;
                        
 		};      
 
@@ -126,7 +128,7 @@ interieurclasse: 	declattribut interieurclasse{}
 			|
 			declconstructeur interieurclasse{}
 			|				
-			%empty{/*todo check*/};
+			%empty{};
 
 declconstructeur: 	TOK_DEF identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_IS bloc{}
 			|
@@ -137,7 +139,7 @@ listparamclass:		paramclass TOK_VIRGULE listparamclass{}
 			|
 			paramclass{}
 			|
-			%empty{/*todo check*/};
+			%empty{};
 
 paramclass:		identval TOK_DEUXPOINTS identclass{}
 			|
@@ -163,13 +165,13 @@ staticoverideoption:   	TOK_STATIC{}
 			|
 			TOK_STATIC TOK_OVERRIDE{}
 			|
-			%empty{/*todo check*/};
+			%empty{};
 
 listparammethod: 	parammethod TOK_VIRGULE listparammethod{}
 			|
 			parammethod{}
 			|
-			%empty{/*todo check*/};
+			%empty{};
 			
 parammethod:		identval TOK_DEUXPOINTS identclass{};
 
@@ -177,7 +179,7 @@ listargs: 		expression TOK_VIRGULE listargs{}
 			|
 			expression{}
 			|
-			%empty{/*todo check*/};
+			%empty{};
 
 expression:		identclass{} 
 			|
@@ -207,9 +209,14 @@ instruction:	affectation{}
 		|
 		TOK_IF expression TOK_THEN instruction TOK_ELSE instruction{};
 
-identclass: 		TOK_NOMCLASSE{};
+identclass: 
+			TOK_NOMCLASSE{};
 
-identval: 		TOK_RESULT{}
+identval: 	TOK_THIS{}
+			|
+			TOK_SUPER{}
+            |
+        	TOK_RESULT{}
 			|
 			TOK_NOM {}
 
@@ -282,13 +289,12 @@ affectation:		expression TOK_AFFECTATION expression TOK_POINTVIRGULE{};
 
 listdeclarationvar: 	declarationvar listdeclarationvar{}
 			|
-			%empty{/*todo check*/};
-
-listinstructionsOpt:	instruction listinstructions{}
-			|
 			%empty{};
 
-listinstructions:	instruction listinstructions{}
+listinstructionsOpt:	instruction listinstructionsOpt{}
+			|
+			%empty{};
+listinstructions:       instruction listinstructionsOpt{};
 
 %%
 
@@ -327,6 +333,13 @@ void yyerror(char *s) {
 	erreursyntx=true;
         fprintf(stderr, "Erreur de syntaxe a la ligne %d: %s\n", lineno, s);
 }
+		
+
+
+			
+
+
+
 
 
 
