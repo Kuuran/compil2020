@@ -9,7 +9,8 @@ int lineno= 1;
 bool erreurlex=false;
 
 
-
+//TODO set yyval pour tous les cas
+//TODO quand on utilise yytext utiliser strdup psk c'est un pointeur (donc sa valeur change a chaque fois et du coup ça donnera un resultat faux)
 %}
 
 %option noyywrap
@@ -83,7 +84,7 @@ yylval.chainecarac = yytext;
 return TOK_NOM;
 }
 {nombre} {
-yylval.nombre = sscanf(yytext, "%ld", &yylval.nombre);
+yylval.nombre = sscanf(yytext, "%ld", &yylval.nombre);//TODO atoi est probablement mieux
 return TOK_NOMBRE;
 }
 
