@@ -18,8 +18,8 @@ extern bool erreurlex;
 
 
 
-%left TOK_DIFFERENCE	TOK_EGALITE
-%left TOK_INFERIEUR	TOK_SUPERIEUR	TOK_INFERIEUREGAL	TOK_SUPERIEUREGAL
+%nonassoc TOK_DIFFERENCE	TOK_EGALITE
+%nonassoc TOK_INFERIEUR	TOK_SUPERIEUR	TOK_INFERIEUREGAL	TOK_SUPERIEUREGAL
 %left TOK_PLUS	TOK_MOINS
 %left TOK_FOIS	TOK_DIVISION TOK_CONCAT
 %nonassoc TOK_POINT
@@ -104,7 +104,7 @@ extern bool erreurlex;
 
 axiome:		%empty{$$ = NIL(Tree);}
 		|	
-		listclasse bloc {$$ = $1, $2;}
+		listclasse bloc {$$ =;}
 		|
 		bloc{$$ = $1;}
 		|
