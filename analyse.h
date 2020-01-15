@@ -66,6 +66,20 @@ typedef struct _Decl
 
 //TODO struct classe methode et les fct pour les creer
 
+typedef struct _Class
+{ char *name;
+  ClassP sClasse;
+  MethodeP* methodes;
+//TODO completer
+
+} Class, *ClassP;
+
+typedef struct _Methode
+{ char *name;
+  VarDeclP* parametres;//TODO pas sur
+  TreeP corps;
+} Methode, *MethodeP;
+
 /* Type pour la valeur de retour de Flex et les actions de Bison
  * le premier champ est necessaire pour Flex.
  * les autres correspondent aux variantes utilisees dans les actions
@@ -90,6 +104,9 @@ typedef union
 TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
+ClassP makeClass();//TODO params
+MethodeP makeMethode(char *n, VarDeclP *p, TreeP c); //cree une methode
+
 
 /* Impression des AST */
 void printAST(TreeP decls, TreeP main);
