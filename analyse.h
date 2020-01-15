@@ -74,6 +74,7 @@ typedef struct _Class
 
 typedef struct _Methode
 { char *name;
+  char *label;
   VarDeclP* parametres;//TODO pas sur
   TreeP corps;
 } Methode, *MethodeP;
@@ -103,7 +104,7 @@ TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass();//TODO params
-MethodeP makeMethode(char *n, VarDeclP *p, TreeP c); //cree une methode
+MethodeP makeMethode(char *n, char *l, VarDeclP *p, TreeP c); //cree une methode
 
 
 /* Impression des AST */
