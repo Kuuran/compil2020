@@ -8,7 +8,7 @@
 int lineno= 1;
 bool erreurlex=false;
 
-
+// test
 //TODO set yyval pour tous les cas
 //TODO quand on utilise yytext utiliser strdup psk c'est un pointeur (donc sa valeur change a chaque fois et du coup ça donnera un resultat faux)
 %}
