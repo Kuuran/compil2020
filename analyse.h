@@ -73,10 +73,10 @@ typedef struct _Class
 } Class, *ClassP;
 
 typedef struct _Methode
-{ char *name;
-  char *label;
-  VarDeclP* parametres;//TODO pas sur
-  TreeP corps;
+{ char *name; // pas util pour la gen de code
+  char *label; // label de debut de fct
+  VarDeclP* parametres;//parametres de la fonction  TODO pas sur
+  TreeP corps; // ça c'est un bloc
 } Methode, *MethodeP;
 
 /* Type pour la valeur de retour de Flex et les actions de Bison
