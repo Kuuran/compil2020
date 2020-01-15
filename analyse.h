@@ -64,8 +64,6 @@ typedef struct _Decl
   struct _Decl *next;
 } VarDecl, *VarDeclP;
 
-//TODO struct classe methode et les fct pour les creer
-
 typedef struct _Class
 { char *name;
   ClassP sClasse;
