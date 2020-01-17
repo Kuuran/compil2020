@@ -64,6 +64,18 @@ typedef struct _Decl
   struct _Decl *next;
 } VarDecl, *VarDeclP;
 
+typedef struct _Type
+{
+  enum {CLASS, STRING, INTEGER} t;
+  union{
+	ClassP class;
+	char *string;
+	int *integer;
+	} u;
+} Type, *TypeP;
+
+
+
 typedef struct _Class
 { char *name;
   ClassP sClasse;
@@ -75,7 +87,8 @@ typedef struct _Class
 typedef struct _Methode
 { char *name; // pas util pour la gen de code
   char *label; // label de debut de fct
-  VarDeclP* parametres;//parametres de la fonction  TODO pas sur
+  VarDeclP parametres;//parametres de la fonction 
+  TypeP typeRetour;
   TreeP corps; // ça c'est un bloc
 } Methode, *MethodeP;
 
@@ -104,7 +117,7 @@ TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass();//TODO params
-MethodeP makeMethode(char *n, char *l, VarDeclP *p, TreeP c); //cree une methode
+MethodeP makeMethode(char *n, char *l, VarDeclP *p, TypeP tr, TreeP c); //cree une methode
 
 
 /* Impression des AST */
