@@ -117,7 +117,7 @@ TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass();//TODO params
-MethodeP makeMethode(char *n, char *l, VarDeclP *p, TypeP tr, TreeP c); //cree une methode
+MethodeP makeMethode(char *n, char *l, VarDeclP p, TypeP tr, TreeP c); //cree une methode
 
 
 /* Impression des AST */
