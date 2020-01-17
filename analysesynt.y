@@ -104,7 +104,7 @@ extern bool erreurlex;
 
 axiome:		%empty{$$ = NIL(Tree);}
 		|	
-		listclasse bloc {$$ =;}
+		listclasse bloc {$$ = $1, $2;}
 		|
 		bloc{$$ = $1;}
 		|
@@ -118,9 +118,9 @@ listclasse:	declclasse listclasse{$$ = $1, $2;}
 		|
 		declclasse{$$ = $1};
 
-declclasse:	TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{}
+declclasse:	TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{$$=makeClass($2,$4,$8.champ,NIL(ClassP),$8.method)}
 		|
-		TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_EXTENDS identclass TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{};
+		TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_EXTENDS identclass TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{$$=makeClass($2,$4,$7,$10.champ,$,$8.method)};
 
 interieurclasse: 	declattribut interieurclasse{$$ = $1, $2;}
 			|
@@ -135,23 +135,23 @@ declconstructeur: 	TOK_DEF identclass TOK_PARENTHESEG listparamclass TOK_PARENTH
 			TOK_DEF identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_DEUXPOINTS identclass TOK_PARENTHESEG listargs TOK_PARENTHESED TOK_IS bloc{};
 
 
-listparamclass:		paramclass TOK_VIRGULE listparamclass{}
+listparamclass:		paramclass TOK_VIRGULE listparamclass{$$= $1, $3;}
 			|
 			paramclass{$$ = $1;}
 			|
 			%empty{$$ = NIL(Tree);};
+  
+paramclass:		identval TOK_DEUXPOINTS identclass{$$=makeval($1.val,$1.type,0), $3;} 
+			|
+			TOK_VAR identval TOK_DEUXPOINTS identclass{$$=makeattribut($2.val,$1.type,0), $4;}; 
 
-paramclass:		identval TOK_DEUXPOINTS identclass{}
+declattribut:		TOK_VAR identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$=makeattribut($2.val,$4,0);}
 			|
-			TOK_VAR identval TOK_DEUXPOINTS identclass{};
-
-declattribut:		TOK_VAR identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{}
+			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$=makeattribut($3.val,$5,1);};  //1 correspond au booléen statique
 			|
-			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{};
+			TOK_VAR identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{$$=makeattribut($2.val,$4)}	
 			|
-			TOK_VAR identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{}	
-			|
-			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{};
+			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{$$=makeattribut($2.val,$4)};
 
 declmethode:		TOK_DEF staticoverideoption identval TOK_PARENTHESEG listparammethod TOK_PARENTHESED TOK_DEUXPOINTS identclass TOK_AFFECTATION expression{}
 			|
