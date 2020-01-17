@@ -16,16 +16,25 @@ MethodeP makeMethode(char*n, char*l, int ovrd, VarDeclP p, TypeP tr TreeP c)
   return result;
 }
 
-ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, ClassP sc, MethodeP m);
+ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
 {
   ClassP result = NEW(1, Class);
 
   result->name = n;
   result->parametres = parm;
   result->champs = ch;
-  result->superClasse = sc; //TODO tester si la sc est définie
+
+  if(strcmp(sc, "") == 0){
+  //parcours de la liste de classes pour chercher si elle existe deja, sinon init a NIL
+  }
+  else{
+  result->superClasse = NIL(ClassP);
+  }
   result->methodes = m;
 
 //TODO rajouter la classe a l'env des sc
+
+//si listclass non vide aller a la fin (on check pendant le parcours qu'on a pas de classes qui ont celle ci en sc, si oui on la met dedans) puis on l'insere. sinon on l'insere au debut (DUH).
+
 
 }

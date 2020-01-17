@@ -120,8 +120,10 @@ typedef union
 TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
-ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, ClassP s, MethodeP m);
-MethodeP makeMethode(char *n, char *l, inr ovrd, VarDeclP p, TypeP tr, TreeP c); //cree une methode
+ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, char* s, MethodeP m);
+MethodeP makeMethode(char *n, char *l, int ovrd, VarDeclP p, TypeP tr, TreeP c); //cree une methode
+
+VarDeclP listeClasses; //stock toutes les classes déja faites pour permettre gerer les super classes
 
 
 /* Impression des AST */
