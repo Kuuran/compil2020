@@ -61,6 +61,7 @@ typedef struct _Tree {
 typedef struct _Decl
 { char *name;
   int val;
+  enum e {PARAM, CHAMP, THIS, RESULT, UNKNOWN} elmt;
   struct _Decl *next;
 } VarDecl, *VarDeclP;
 
