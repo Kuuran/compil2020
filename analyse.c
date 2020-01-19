@@ -2,7 +2,7 @@
 
 
 
-MethodeP makeMethode(char*n, char*l, int ovrd, VarDeclP p, TypeP tr TreeP c)
+MethodeP makeMethode(char*n, char*l, int ovrd, int stk, VarDeclP p, TypeP tr TreeP c)
 {//TODO c'est nul, a refaire
   MethodeP result = NEW(1, Methode);
   result->name = strdup(n);
@@ -11,7 +11,8 @@ MethodeP makeMethode(char*n, char*l, int ovrd, VarDeclP p, TypeP tr TreeP c)
   result->corps = c;
   result->typeRetour = tr;
   result->next = NIL(MethodeP);
-  result->override = ovrd;
+  result->ovrd = ovrd;
+  result->stk = stk;
 
   return result;
 }
@@ -28,7 +29,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
   //parcours de la liste de classes pour chercher si elle existe deja, sinon init a NIL
   }
   else{
-  result->superClasse = NIL(ClassP);
+  result->superClasse = NIL(Class);
   }
   result->methodes = m;
 
