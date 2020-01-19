@@ -99,7 +99,7 @@ AST:
 
 à ajouter 
 makevar(nom, type, enum elmt, bool var) //elmt = a quoi ça correspont (champ, param...) var = est-ce qu'on a un tok_var
-makeattribut(valeur ident, type,valeur, static, classe de présence)
+makeattribut(valeur ident, type,valeur, static)
 ajouter champs static makemethod -- ok
 
 
