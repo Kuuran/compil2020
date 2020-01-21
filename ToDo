@@ -146,6 +146,7 @@ verifier le typage des operations (plus parametres de fct, plus types de retour)
 
 POUR ZAC :
 coder la fonction makeMethode et la fonction makeVar
+pour makeVar pense a remplir la liste des declarations (listeDeclarations a la fin du .h)
 
 
 

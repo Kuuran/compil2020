@@ -17,6 +17,7 @@ MethodeP makeMethode(char*n, char*l, int ovrd, int stk, VarDeclP p, TypeP tr Tre
   return result;
 }
 
+
 ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
 {
   ClassP result = NEW(1, Class);
@@ -46,6 +47,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
     result->superClasse = NEW(1, Class);
     result->superClasse.name = sc;
   }
+//TODO faut verifier les methodes redefinies si la sc existe, sinon faut noter qu'on la pas fait et le faire quand la sc sera declaree.
   result->methodes = m;
 
 // ajout de la classe a l'environement des classes, on vérifie au passage qu'elle n'est pas superclasse d'une classe déja définie (si c'est le cas on définit la sc de la classe en question)

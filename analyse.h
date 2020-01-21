@@ -126,6 +126,7 @@ MethodeP makeMethode(char *n, char *l, bool ovrd, bool stk, VarDeclP p, TypeP tr
 VarDeclP makeVar(char *name, char *type, enum e elmt, bool var);
 
 VarDeclP listeClasses; //stock toutes les classes déja faites pour permettre gerer les super classes
+VarDeclP listeDeclarations;
 
 
 /* Impression des AST */
