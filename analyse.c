@@ -26,16 +26,68 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
   result->champs = ch;
 
   if(strcmp(sc, "") == 0){
-  //parcours de la liste de classes pour chercher si elle existe deja, sinon init a NIL
+  //parcours de la liste de classes pour chercher si elle existe deja, sinon on cree une classe qui a le bon nom
+  if(!listeClasses == NIL(VarDecl)){
+   int i = 1;
+   VarDeclP tmpList = listeClasses;
+   while(i){
+     if(!strcmp(tmpList->val.u.classe->name, sc) == 0){
+        result->superClasse = tmpList->val.u.classe;
+        i = 0;
+     }
+     else{
+       tmpList = tmpList->next;
+     }
+    }
+  }
+
   }
   else{
-  result->superClasse = NIL(Class);
+    result->superClasse = NEW(1, Class);
+    result->superClasse.name = sc;
   }
   result->methodes = m;
 
-//TODO rajouter la classe a l'env des sc
+// ajout de la classe a l'environement des classes, on vérifie au passage qu'elle n'est pas superclasse d'une classe déja définie (si c'est le cas on définit la sc de la classe en question)
 
-//si listclass non vide aller a la fin (on check pendant le parcours qu'on a pas de classes qui ont celle ci en sc, si oui on la met dedans) puis on l'insere. sinon on l'insere au debut (DUH).
-
-
+  if(listeClasses == NIL(VarDecl)){
+    listClasses = NEW(1, VarDecl);
+    listClasses.val.u.classe = result;
+  }
+  else{
+    VarDeclP tmpList = listeClasses;
+    int i = 1;
+    while(i){
+      if(!strcmp(tmpList.val.u->classe->name, result->name) == 0){
+        tmpList.val.u->classe = result;
+      }
+      tmpList = tmpList->next;
+      if(tmpList = NIL(VarDecl){
+        tmpList.val.u->classe = result;
+        i = 0;
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

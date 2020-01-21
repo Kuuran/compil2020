@@ -61,7 +61,7 @@ typedef struct _Tree {
 typedef struct _Decl
 { char *name;
   Type val;
-  enum e {PARAM, CHAMP, CHAMPSTATIC, THIS, RESULT, UNKNOWN} elmt;
+  enum e {PARAM, CHAMP, CHAMPSTATIC, THIS, RESULT, CLASS, UNKNOWN} elmt;
   struct _Decl *next;
 } VarDecl, *VarDeclP;
 
@@ -69,7 +69,7 @@ typedef struct _Type
 {
   enum {CLASS, STRING, INTEGER} t;
   union{
-	ClassP class;
+	ClassP classe;
 	char *string;
 	int *integer;
 	} u;
