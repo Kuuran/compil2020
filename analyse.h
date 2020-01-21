@@ -96,7 +96,7 @@ typedef struct _Methode
   TreeP corps; // ça c'est un bloc
   MethodeP next;
 } Methode, *MethodeP;
-
+l
 /* Type pour la valeur de retour de Flex et les actions de Bison
  * le premier champ est necessaire pour Flex.
  * les autres correspondent aux variantes utilisees dans les actions

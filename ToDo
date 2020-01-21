@@ -130,9 +130,22 @@ dans une table de hashage avec pour clée le nom de la classe.
 
 
 
+liste des trucs a faire
+
+finir les structures pour l'ast et leurs fonctions associées
+
+Semantique : verifier l'existance des classes / methodes dans l'environnement quand on les appelle
+verifier la portée des variables
+verifier les en tete de fonctions (en incluant les redefinitions)
+
+verifier le typage des operations (plus parametres de fct, plus types de retour)
 
 
 
+
+
+POUR ZAC :
+coder la fonction makeMethode et la fonction makeVar
 
 
 
