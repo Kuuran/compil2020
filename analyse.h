@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "analysesynt.tab.h"
+//#include "analysesynt.tab.h"
 int yylex(void);
 void yyerror(char*);
 
@@ -17,8 +17,11 @@ void yyerror(char*);
 
 #define TRUE 1
 #define FALSE 0
-typedef int bool;
+typedef int Bool;
 
+typedef struct _Type Type, *TypeP;
+typedef struct _Class *ClassP;
+typedef struct _Methode *MethodeP;
 
 /* Codes d'erreurs */
 #define NO_ERROR	0
@@ -60,8 +63,8 @@ typedef struct _Tree {
  */
 typedef struct _Decl
 { char *name;
-  Type val;
-  enum e {PARAM, PARAMVAR, CHAMP, INSTANCE, THIS, RESULT, CLASS, UNKNOWN} elmt;
+  TypeP val;
+  enum e {PARAM, PARAMVAR, CHAMP, INSTANCE, THIS, RESULT, CLASSE, UNKNOWN} elmt;
   struct _Decl *next;
 } VarDecl, *VarDeclP;
 
@@ -88,16 +91,16 @@ typedef struct _Class
 typedef struct _Methode
 { char *name; // pas util pour la gen de code
   char *label; // label de debut de fct
-  bool ovrd;
-  bool stk;
-  bool cstr;
+  Bool ovrd;
+  Bool stk;
+  Bool cstr;
 
   VarDeclP parametres;//parametres de la fonction 
   TypeP typeRetour;
   TreeP corps; // ça c'est un bloc
   MethodeP next;
 } Methode, *MethodeP;
-l
+
 /* Type pour la valeur de retour de Flex et les actions de Bison
  * le premier champ est necessaire pour Flex.
  * les autres correspondent aux variantes utilisees dans les actions
@@ -123,7 +126,7 @@ TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, char* s, MethodeP m);
-MethodeP makeMethode(char *n, char *l, bool ovrd, bool stk, bool cstr, VarDeclP p, TypeP tr, TreeP c); //cree une methode
+MethodeP makeMethode(char *n, char *l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c); //cree une methode
 VarDeclP makeVar(char *name, char *type, enum e elmt);
 
 VarDeclP listeClasses; //stock toutes les classes déja faites pour permettre gerer les super classes

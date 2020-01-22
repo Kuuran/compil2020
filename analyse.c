@@ -2,23 +2,28 @@
 
 
 
-MethodeP makeMethode(char*n, char*l, int ovrd, int stk, VarDeclP p, TypeP tr, TreeP c)
+MethodeP makeMethode(char*n, char*l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c)
 {//TODO c'est nul, a refaire
   MethodeP result = NEW(1, Methode);
   result->name = strdup(n);
   result->label = strdup(l);
   result->parametres = p;
+
   result->corps = c;
+
   result->typeRetour = tr;
-  result->next = NIL(MethodeP);
+
+  result->next = NIL(Methode); //il faut un env de methodes (a vider une fois qu'on a cree la classe
+
   result->ovrd = ovrd;
   result->stk = stk;
+  result->cstr = cstr;
 
   return result;
 }
 
 
-ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
+ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m)
 {
   ClassP result = NEW(1, Class);
 
@@ -72,7 +77,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
   }
 }
 
-varDeclP makeVar(char *name, char *type, enum e elmt){
+VarDeclP makeVar(char *name, char *type, enum e elmt){
   VarDeclP result = NEW(1, VarDecl);
   result->name = strdup(name);
 
@@ -80,7 +85,7 @@ varDeclP makeVar(char *name, char *type, enum e elmt){
 	case "Integer": result->val.t = INTEGER; break;
 	case "String": result->val.t = STRING; break;
 	default :
-		//TODO parcours de la liste de classes pour assigner le bon type
+		//parcours de la liste de classes pour assigner le bon type
 	int i = 1;
 	VarDeclP listeTmp = listeClasses;
 	while(i){
