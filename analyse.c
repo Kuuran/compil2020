@@ -72,6 +72,25 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
   }
 }
 
+varDeclP makeVar(char *name, char *type, enum e elmt){
+  VarDeclP result = NEW(1, VarDecl);
+
+  //TODO check si une var du meme nom existe dans l'env
+  result->name = strdup(name);
+
+  switch (type){
+	case "Integer": result->val.t = INTEGER; break;
+	case "String": result->val.t = STRING; break;
+	default :
+		//TODO parcours de la liste de classes pour assigner le bon type
+
+  }
+
+  result->elmt = elmt;
+  
+
+
+}
 
 
 

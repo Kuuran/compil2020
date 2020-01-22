@@ -61,7 +61,7 @@ typedef struct _Tree {
 typedef struct _Decl
 { char *name;
   Type val;
-  enum e {PARAM, CHAMP, CHAMPSTATIC, THIS, RESULT, CLASS, UNKNOWN} elmt;
+  enum e {PARAM, PARAMVAR, CHAMP, INSTANCE, THIS, RESULT, CLASS, UNKNOWN} elmt;
   struct _Decl *next;
 } VarDecl, *VarDeclP;
 
@@ -90,6 +90,7 @@ typedef struct _Methode
   char *label; // label de debut de fct
   bool ovrd;
   bool stk;
+  bool cstr;
 
   VarDeclP parametres;//parametres de la fonction 
   TypeP typeRetour;
@@ -122,8 +123,8 @@ TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, char* s, MethodeP m);
-MethodeP makeMethode(char *n, char *l, bool ovrd, bool stk, VarDeclP p, TypeP tr, TreeP c); //cree une methode
-VarDeclP makeVar(char *name, char *type, enum e elmt, bool var);
+MethodeP makeMethode(char *n, char *l, bool ovrd, bool stk, bool cstr VarDeclP p, TypeP tr, TreeP c); //cree une methode
+VarDeclP makeVar(char *name, char *type, enum e elmt);
 
 VarDeclP listeClasses; //stock toutes les classes déja faites pour permettre gerer les super classes
 VarDeclP listeDeclarations;
