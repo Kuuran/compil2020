@@ -123,7 +123,7 @@ TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, char* s, MethodeP m);
-MethodeP makeMethode(char *n, char *l, bool ovrd, bool stk, bool cstr VarDeclP p, TypeP tr, TreeP c); //cree une methode
+MethodeP makeMethode(char *n, char *l, bool ovrd, bool stk, bool cstr, VarDeclP p, TypeP tr, TreeP c); //cree une methode
 VarDeclP makeVar(char *name, char *type, enum e elmt);
 
 VarDeclP listeClasses; //stock toutes les classes déja faites pour permettre gerer les super classes

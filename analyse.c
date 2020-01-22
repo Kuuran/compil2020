@@ -2,7 +2,7 @@
 
 
 
-MethodeP makeMethode(char*n, char*l, int ovrd, int stk, VarDeclP p, TypeP tr TreeP c)
+MethodeP makeMethode(char*n, char*l, int ovrd, int stk, VarDeclP p, TypeP tr, TreeP c)
 {//TODO c'est nul, a refaire
   MethodeP result = NEW(1, Methode);
   result->name = strdup(n);
@@ -47,7 +47,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
     result->superClasse = NEW(1, Class);
     result->superClasse.name = sc;
   }
-//TODO faut verifier les methodes redefinies si la sc existe, sinon faut noter qu'on la pas fait et le faire quand la sc sera declaree.
+
   result->methodes = m;
 
 // ajout de la classe a l'environement des classes, on vérifie au passage qu'elle n'est pas superclasse d'une classe déja définie (si c'est le cas on définit la sc de la classe en question)
@@ -74,8 +74,6 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m);
 
 varDeclP makeVar(char *name, char *type, enum e elmt){
   VarDeclP result = NEW(1, VarDecl);
-
-  //TODO check si une var du meme nom existe dans l'env
   result->name = strdup(name);
 
   switch (type){
@@ -83,6 +81,18 @@ varDeclP makeVar(char *name, char *type, enum e elmt){
 	case "String": result->val.t = STRING; break;
 	default :
 		//TODO parcours de la liste de classes pour assigner le bon type
+	int i = 1;
+	VarDeclP listeTmp = listeClasses;
+	while(i){
+		if(strcmp(type, listeTmp->val.u->classe->name) == 0){
+			listeTmp = listeTmp->next;
+		}
+		else{
+			result->val.t = CLASS;
+			result->val.u->classe = listeTmp->val.u->classe;
+			i = ;
+		}
+	}
 
   }
 
