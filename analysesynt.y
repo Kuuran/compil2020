@@ -102,9 +102,13 @@ extern bool erreurlex;
 
 %%
 
+//PAS DE CLASSES POUR LE MOMENT
+
+
+
 axiome:		%empty{$$ = NIL(Tree);}
 		|	
-		listclasse bloc {$$ = $1, $2;}
+		listclasse bloc {/*$$ = $1, $2;*/}
 		|
 		bloc{$$ = $1;}
 		|
@@ -114,44 +118,44 @@ axiome:		%empty{$$ = NIL(Tree);}
                        
 		};      
 
-listclasse:	declclasse listclasse{$$ = $1, $2;}
+listclasse:	declclasse listclasse{/*$$ = $1, $2;*/}
 		|
-		declclasse{$$ = $1};
+		declclasse{/*$$ = $1*/};
 
-declclasse:	TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{$$=makeClass($2,$4,$8.champ,NIL(ClassP),$8.method)}
+declclasse:	TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{/*$$=makeClass($2,$4,$8.champ,NIL(ClassP),$8.method)*/}
 		|
-		TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_EXTENDS identclass TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{$$=makeClass($2,$4,$7,$10.champ,$,$8.method)};
+		TOK_CLASS identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_EXTENDS identclass TOK_IS TOK_CROCHETG interieurclasse TOK_CROCHETD{/*$$=makeClass($2,$4,$7,$10.champ,$,$8.method)*/};
 
-interieurclasse: 	declattribut interieurclasse{$$ = $1, $2;}
+interieurclasse: 	declattribut interieurclasse{/*$$ = $1, $2;*/}
 			|
-			declmethode interieurclasse{$$ = $1, $2;}
+			declmethode interieurclasse{/*$$ = $1, $2;*/}
 			|
-			declconstructeur interieurclasse{$$ = $1, $2;}
+			declconstructeur interieurclasse{/*$$ = $1, $2;*/}
 			|				
-			%empty{$$ = NIL(Tree);};
+			%empty{/*$$ = NIL(Tree);*/};
 
 declconstructeur: 	TOK_DEF identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_IS bloc{}
 			|
 			TOK_DEF identclass TOK_PARENTHESEG listparamclass TOK_PARENTHESED TOK_DEUXPOINTS identclass TOK_PARENTHESEG listargs TOK_PARENTHESED TOK_IS bloc{};
 
 
-listparamclass:		paramclass TOK_VIRGULE listparamclass{$$= $1, $3;}
+listparamclass:		paramclass TOK_VIRGULE listparamclass{/*$$= $1, $3;*/}
 			|
-			paramclass{$$ = $1;}
+			paramclass{/*$$ = $1;*/}
 			|
-			%empty{$$ = NIL(Tree);};
+			%empty{/*$$ = NIL(Tree);*/};
   
-paramclass:		identval TOK_DEUXPOINTS identclass{$$=makeval($1.val,$1.type,0), $3;} 
+paramclass:		identval TOK_DEUXPOINTS identclass{/*$$=makeval($1.val,$1.type,0), $3;*/} 
 			|
-			TOK_VAR identval TOK_DEUXPOINTS identclass{$$=makeattribut($2.val,$1.type,0), $4;}; 
+			TOK_VAR identval TOK_DEUXPOINTS identclass{/*$$=makeattribut($2.val,$1.type,0), $4;*/}; 
 
-declattribut:		TOK_VAR identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$=makeattribut($2.val,$4,0);}
+declattribut:		TOK_VAR identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{/*$$=makeattribut($2.val,$4,0);*/}
 			|
-			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$=makeattribut($3.val,$5,1);};  //1 correspond au booléen statique
+			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{/*$$=makeattribut($3.val,$5,1);*/};  //1 correspond au booléen statique
 			|
-			TOK_VAR identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{$$=makeattribut($2.val,$4)}	
+			TOK_VAR identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{/*$$=makeattribut($2.val,$4)*/}	
 			|
-			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{$$=makeattribut($2.val,$4)};
+			TOK_VAR TOK_STATIC identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{/*$$=makeattribut($2.val,$4)*/};
 
 declmethode:		TOK_DEF staticoverideoption identval TOK_PARENTHESEG listparammethod TOK_PARENTHESED TOK_DEUXPOINTS identclass TOK_AFFECTATION expression{}
 			|
@@ -165,23 +169,23 @@ staticoverideoption:   	TOK_STATIC{}
 			|
 			TOK_STATIC TOK_OVERRIDE{}
 			|
-			%empty{$$ = NIL(Tree);};
+			%empty{/*$$ = NIL(Tree);*/};
 
 listparammethod: 	parammethod TOK_VIRGULE listparammethod{}
 			|
-			parammethod{$$ = $1;}
+			parammethod{/*$$ = $1;*/}
 			|
-			%empty{$$ = NIL(Tree);};
+			%empty{/*$$ = NIL(Tree);*/};
 			
 parammethod:		identval TOK_DEUXPOINTS identclass{};
 
 listargs: 		expression TOK_VIRGULE listargs{}
 			|
-			expression{$$ = $1;}
+			expression{/*$$ = $1;*/}
 			|
-			%empty{$$ = NIL(Tree);};
+			%empty{/*$$ = NIL(Tree);*/};
 
-expression:		identclass{$$ = $1} 
+expression:		identclass{/*$$ = $1;*/} 
 			|
 			identval{$$ = $1;}
 			|
@@ -189,34 +193,34 @@ expression:		identclass{$$ = $1}
 			|
 			TOK_PARENTHESEG TOK_AS identclass TOK_DEUXPOINTS expression TOK_PARENTHESED{}
 			|
-			TOK_PARENTHESEG expression TOK_PARENTHESED{}
+			TOK_PARENTHESEG expression TOK_PARENTHESED{$$=$2}
 			|
-			selection{$$ = $1;}
+			selection{/*$$ = $1;*/}
 			|
-			instanciation{$$ = $1;}
+			instanciation{/*$$ = $1;*/}
 			|
-			envoimsg{$$ = $1;}
+			envoimsg{/*$$ = $1;*/}
 			|
 			expwithop{$$ = $1;};
 
 instruction:	affectation{$$ = $1;}
 		|
-		expression TOK_POINTVIRGULE {}
+		expression TOK_POINTVIRGULE {$$=$1}
 		|
 		bloc{$$ = $1;}
 		|
-		TOK_RETURN TOK_POINTVIRGULE{}
+		TOK_RETURN TOK_POINTVIRGULE{$$=/*aller fin de boucle*/}
 		|
-		TOK_IF expression TOK_THEN instruction TOK_ELSE instruction{};
+		TOK_IF expression TOK_THEN instruction TOK_ELSE instruction{$$=$1,$4,$6};
 
 identclass: 
-			TOK_NOMCLASSE{$$ = makeLeafStr(/*TODO etiquette a faire bien*/, $1);};
-
-identval: 	TOK_THIS{$$ = makeLeafStr(/*TODO etiquette pour this*/, $1);}
+			TOK_NOMCLASSE{/*$$ = makeLeafStr(, $1);*/};
+	
+identval: 		TOK_THIS{/*$$ = makeLeafStr(, $1);*/}
 			|
-			TOK_SUPER{$$ = makeLeafStr(/*TODO etiquette pour super*/, $1);}
-            |
-        	TOK_RESULT{$$ = makeLeafStr(/*TODO etiquette pour result*/, $1);}
+			TOK_SUPER{/*$$ = makeLeafStr(, $1);*/}
+           		|
+        		TOK_RESULT{/*$$ = makeLeafStr(, $1);*/}
 			|
 			TOK_NOM {$$ = makeLeafStr(/*TODO etiquette*/, $1);}
 
@@ -225,13 +229,13 @@ selection:		expression TOK_POINT identval{}
 
 
 
-const:			TOK_CHAINECARAC{}
+const:			TOK_CHAINECARAC{$$=$1.yylval;}
 			|
-			TOK_NOMBRE{};
+			TOK_NOMBRE{$$=$1.yylval;};
 
 instanciation:		TOK_NEW identclass TOK_PARENTHESEG listargs TOK_PARENTHESED{};
 
-envoimsg:  		expression TOK_POINT identval TOK_PARENTHESEG listargs TOK_PARENTHESED{}
+envoimsg:  		expression TOK_POINT identval TOK_PARENTHESEG listargs TOK_PARENTHESED{};
 
 
 expwithop:		superieur{$$ = $1;}
@@ -275,9 +279,9 @@ superieuregal: 		expression TOK_SUPERIEUREGAL expression{};
 inferieuregal: 		expression TOK_INFERIEUREGAL expression{};
 
 
-bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{}
+bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$=$2}
 	|
-	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{}
+	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$=$2,$4}
 
 
 declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{}
