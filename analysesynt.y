@@ -28,50 +28,50 @@ extern bool erreurlex;
  
 
 
-%type<texte>   axiome	
-%type<texte>   listclasse	
-%type<texte>   declclasse	
-%type<texte>   interieurclasse	
-%type<texte>   declconstructeur	
-%type<texte>   listparamclass	
-%type<texte>   paramclass	
-%type<texte>   declattribut	
-%type<texte>   declmethode	
-%type<texte>   listparammethod	
-%type<texte>   parammethod	
-%type<texte>   listargs	
-%type<texte>   expression
-%type<texte>   identclass	
-%type<texte>   identval	
-%type<texte>   selection	
-%type<texte>   const	
-%type<texte>   instanciation	
-%type<texte>   envoimsg	
-%type<texte>   expwithop	
-%type<texte>   concat	
-%type<texte>   nonegalite	
-%type<texte>   egalite	
-%type<texte>   moinsunaire	
-%type<texte>   plusunaire	
-%type<texte>   addition	
-%type<texte>   soustraction	
-%type<texte>   multiplication	
-%type<texte>   superieur	
-%type<texte>   inferieur	
-%type<texte>   division	
-%type<texte>   instruction	
-%type<texte>   bloc	
-%type<texte>   declarationvar	
-%type<texte>   affectation	
-%type<texte>   listdeclarationvar
-%type<texte>   listinstructions	
-%type<texte>   listinstructionsOpt
+%type<S>   axiome	
+%type<S>   listclasse	
+%type<S>   declclasse	
+%type<S>   interieurclasse	
+%type<S>   declconstructeur	
+%type<S>   listparamclass	
+%type<S>   paramclass	
+%type<S>   declattribut	
+%type<S>   declmethode	
+%type<S>   listparammethod	
+%type<S>   parammethod	
+%type<S>   listargs	
+%type<S>   expression
+%type<S>   identclass	
+%type<S>   identval	
+%type<S>   selection	
+%type<S>   const	
+%type<S>   instanciation	
+%type<S>   envoimsg	
+%type<S>   expwithop	
+%type<S>   concat	
+%type<S>   nonegalite	
+%type<S>   egalite	
+%type<S>   moinsunaire	
+%type<S>   plusunaire	
+%type<S>   addition	
+%type<S>   soustraction	
+%type<S>   multiplication	
+%type<S>   superieur	
+%type<S>   inferieur	
+%type<S>   division	
+%type<S>   instruction	
+%type<S>   bloc	
+%type<S>   declarationvar	
+%type<S>   affectation	
+%type<S>   listdeclarationvar
+%type<S>   listinstructions	
+%type<S>   listinstructionsOpt
 
 
-%token<texte> TOK_CHAINECARAC
-%token<texte> TOK_NOMCLASSE
-%token<texte> TOK_NOM
-%token<texte> TOK_NOMBRE
+%token<S> TOK_CHAINECARAC
+%token<S> TOK_NOMCLASSE
+%token<S> TOK_NOM
+%token<S> TOK_NOMBRE
 %token TOK_AFFECTATION
 %token TOK_PARENTHESED
 %token TOK_PARENTHESEG
@@ -167,8 +167,6 @@ staticoverideoption:   	TOK_STATIC{}
 			|
 			TOK_OVERRIDE{}
 			|
-			TOK_STATIC TOK_OVERRIDE{}
-			|
 			%empty{/*$$ = NIL(Tree);*/};
 
 listparammethod: 	parammethod TOK_VIRGULE listparammethod{}
@@ -193,7 +191,7 @@ expression:		identclass{/*$$ = $1;*/}
 			|
 			TOK_PARENTHESEG TOK_AS identclass TOK_DEUXPOINTS expression TOK_PARENTHESED{}
 			|
-			TOK_PARENTHESEG expression TOK_PARENTHESED{$$=$2}
+			TOK_PARENTHESEG expression TOK_PARENTHESED{$$=$2;}
 			|
 			selection{/*$$ = $1;*/}
 			|
@@ -205,13 +203,13 @@ expression:		identclass{/*$$ = $1;*/}
 
 instruction:	affectation{$$ = $1;}
 		|
-		expression TOK_POINTVIRGULE {$$=$1}
+		expression TOK_POINTVIRGULE {$$=$1;}
 		|
 		bloc{$$ = $1;}
 		|
-		TOK_RETURN TOK_POINTVIRGULE{$$=/*aller fin de boucle*/}
+		TOK_RETURN TOK_POINTVIRGULE{/*$$=aller fin de boucle*/}
 		|
-		TOK_IF expression TOK_THEN instruction TOK_ELSE instruction{$$=$1,$4,$6};
+		TOK_IF expression TOK_THEN instruction TOK_ELSE instruction{/*$$=$1,$4,$6*/};
 
 identclass: 
 			TOK_NOMCLASSE{/*$$ = makeLeafStr(, $1);*/};
@@ -222,16 +220,16 @@ identval: 		TOK_THIS{/*$$ = makeLeafStr(, $1);*/}
            		|
         		TOK_RESULT{/*$$ = makeLeafStr(, $1);*/}
 			|
-			TOK_NOM {$$ = makeLeafStr(/*TODO etiquette*/, $1);}
+			TOK_NOM {$$ = makeLeafStr(Eidvar, $1);}
 
 
 selection:		expression TOK_POINT identval{}
 
 
 
-const:			TOK_CHAINECARAC{$$=$1.yylval;}
+const:			TOK_CHAINECARAC{$$=makeLeafStr(Econst , $1);}
 			|
-			TOK_NOMBRE{$$=$1.yylval;};
+			TOK_NOMBRE{$$=makeLeafStr(Econst , $1);};
 
 instanciation:		TOK_NEW identclass TOK_PARENTHESEG listargs TOK_PARENTHESED{};
 
@@ -260,9 +258,9 @@ expwithop:		superieur{$$ = $1;}
 			|
 			division{$$ = $1;}
 			|
-			superieuregal{$$ = $1;}
+			superieuregal{/*$$ = $1;*/}
 			|
-			inferieuregal{$$ = $1;};
+			inferieuregal{/*$$ = $1;*/};
 
 concat: 		expression TOK_CONCAT expression{};
 nonegalite: 		expression TOK_DIFFERENCE expression{};
@@ -279,9 +277,9 @@ superieuregal: 		expression TOK_SUPERIEUREGAL expression{};
 inferieuregal: 		expression TOK_INFERIEUREGAL expression{};
 
 
-bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$=$2}
+bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$=$2;}
 	|
-	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$=$2,$4}
+	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$=$2,$4;}
 
 
 declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{}
@@ -302,7 +300,7 @@ listinstructions:       instruction listinstructionsOpt{};
 
 %%
 
-int main(void){
+/*int main(void){
  
         printf("Debut de l'analyse syntaxique :\n");
         yyparse();
@@ -332,11 +330,11 @@ int main(void){
         }
 
         return EXIT_SUCCESS;
-}
-void yyerror(char *s) {
+}*/
+/*void yyerror(char *s) {
 	erreursyntx=true;
         fprintf(stderr, "Erreur de syntaxe a la ligne %d: %s\n", lineno, s);
-}
+}*/
 		
 
 

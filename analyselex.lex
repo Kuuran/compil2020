@@ -4,10 +4,11 @@
 #include <string.h>
 #include <stdbool.h>
 #include "analyse.h"
+#include "analyse_y.h"
 
 int lineno= 1;
 bool erreurlex=false;
-
+extern YYSTYPE yylval;
 
 
 %}
@@ -27,7 +28,7 @@ comment [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]
 
 
 {chainecarac} {
-yylval.chainecarac = strdup(yytext);
+yylval.S = strdup(yytext);
 return TOK_CHAINECARAC;
 }
 
@@ -75,15 +76,15 @@ return TOK_CHAINECARAC;
 
 
 {nomClasse} {
-yylval.chainecarac = strdup(yytext);
+yylval.S = strdup(yytext);
 return TOK_NOMCLASSE;
 }
 {nom} {
-yylval.chainecarac = strdup(yytext);
+yylval.S = strdup(yytext);
 return TOK_NOM;
 }
 {nombre} {
-yylval.nombre = atoi(yytext);
+yylval.I = atoi(yytext);
 return TOK_NOMBRE;
 }
 
