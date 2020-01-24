@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-//#include "analysesynt.tab.h"
+/*#include "analysesynt.tab.h"*/
 int yylex(void);
 void yyerror(char*);
 
@@ -32,14 +32,39 @@ typedef struct _Methode *MethodeP;
 #define EVAL_ERROR	5
 #define UNEXPECTED	10
 
-//TODO a modif
+/*TODO a modif*/
 /* Etiquettes pour les arbres de syntaxe abstraite */
 typedef enum {
   Eadd, Eminus, Emult, Ediv,
-  Eneq, Eeq, Egt, Ege, Elt, Ele,
+  Eneq, Eeq, Esup, Esupeq, Einf, Einfeq,
   Econst, Eidvar,
-  Eite
+  Eiteration, Edecl, Eclass, Enew, Eresult, Emethode, Eselect
 } Etiquette;
+
+
+#define	Eminus		1
+#define	Emult		2
+#define	Ediv		3
+#define	Eneq		4
+#define	Eeq		5
+#define	Esup		6 
+#define	Esupeq		7 
+#define	Einf		8
+#define	Einfeq		9
+#define	Econst		10
+#define	Eidvar		11
+#define	Eiteration	12
+#define	Eadd		13
+#define	Edecl		14
+#define	Eclass		15
+#define	Enew		16
+#define	Eresult		17
+#define	Emethode	18
+#define	Eselect		19
+
+
+
+
 
 
 		/* Definition d'un arbre de syntaxe abstraite */
@@ -89,15 +114,15 @@ typedef struct _Class
 } Class, *ClassP;
 
 typedef struct _Methode
-{ char *name; // pas util pour la gen de code
-  char *label; // label de debut de fct
+{ char *name; /* pas util pour la gen de code*/
+  char *label; /* label de debut de fct*/
   Bool ovrd;
   Bool stk;
   Bool cstr;
 
-  VarDeclP parametres;//parametres de la fonction 
+  VarDeclP parametres;/*parametres de la fonction */
   TypeP typeRetour;
-  TreeP corps; // ça c'est un bloc
+  TreeP corps; /* ça c'est un bloc*/
   MethodeP next;
 } Methode, *MethodeP;
 
@@ -126,10 +151,10 @@ TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, char* s, MethodeP m);
-MethodeP makeMethode(char *n, char *l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c); //cree une methode
+MethodeP makeMethode(char *n, char *l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c); /*cree une methode*/
 VarDeclP makeVar(char *name, char *type, enum e elmt);
 
-VarDeclP listeClasses; //stock toutes les classes déja faites pour permettre gerer les super classes
+VarDeclP listeClasses; /*stock toutes les classes déja faites pour permettre gerer les super classes*/
 VarDeclP listeDeclarations;
 
 
