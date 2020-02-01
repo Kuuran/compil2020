@@ -39,7 +39,7 @@ typedef enum {
   Eadd, Eminus, Emult, Ediv,
   Eneq, Eeq, Esup, Esupeq, Einf, Einfeq,
   Econst, Eidvar, Eaff, Estr,
-  Eiteration, Edecl, Eclass, Enew, Eresult, Emethode, Eselect, Ethis, Esuper,
+  Eite, Edecl, Eclass, Enew, Eresult, Emethode, Eselect, Ethis, Esuper,
   Ebloc, Elist, Evide, AXIOME
 } Etiquette;
 
@@ -55,7 +55,7 @@ typedef enum {
 #define	Einfeq		9
 #define	Econst		10
 #define	Eidvar		11
-#define	Eiteration	12
+#define	Eite		12
 #define	Eadd		13
 #define	Edecl		14
 #define	Eclass		15
@@ -177,6 +177,7 @@ VarDeclP addToScope(VarDeclP nouv, VarDeclP list);
 VarDeclP listeClasses; /*stock toutes les classes déja faites pour permettre gerer les super classes*/
 VarDeclP varGlobales;
 
+TreeP getChild(TreeP tree, int i);
 
 /* Impression des AST */
 void printAST(TreeP decls, TreeP main);
@@ -194,6 +195,9 @@ Bool analyseBloc(TreeP T);
 
 /*Verification de la portee des variables d'un bloc*/
 Bool portee(TreeP listinst, VarDeclP listdecl);
+
+/*verifie si une declaration est presente dans l'environment des declarations*/
+Bool contient(VarDeclP listdecl, char* name);
 
 /*Typage d'une expression*/
 Bool typage(TreeP T);

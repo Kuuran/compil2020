@@ -71,7 +71,7 @@ extern bool erreurlex;
 %token<S> TOK_CHAINECARAC
 %token<S> TOK_NOMCLASSE
 %token<S> TOK_NOM
-%token<I> TOK_NOMBRE
+%token<S> TOK_NOMBRE
 %token TOK_AFFECTATION
 %token TOK_PARENTHESED
 %token TOK_PARENTHESEG
@@ -110,7 +110,8 @@ axiome:		%empty{$$ = NIL(Tree);}
 		|	
 		listclasse bloc {/*$$ = $1, $2;*/}
 		|
-		bloc{$$ = makeTree(AXIOME, 2, makeTree(Evide, 0), $1);}
+		bloc{analyseSem($1);
+/*$$ = makeTree(AXIOME, 2, makeTree(Evide, 0), $1);*/}
 		|
 		axiome error{
 			erreursyntx=true;
@@ -290,7 +291,7 @@ affectation:		expression TOK_AFFECTATION expression TOK_POINTVIRGULE{$$ = makeTr
 
 listdeclarationvar: 	declarationvar listdeclarationvar{$$ = addToScope($1, $2);}
 			|
-			%empty{$$ = NIL(Tree);};
+			%empty{$$ = NIL(VarDecl);};
 
 listinstructionsOpt:	instruction listinstructionsOpt{$$ = makeTree(Elist, 2, $1, $2);}
 			|

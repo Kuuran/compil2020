@@ -12,8 +12,8 @@
 MethodeP makeMethode(char* n, char* l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c)
 {/*TODO c'est nul, a refaire*/
   MethodeP result = NEW(1, Methode);
-  result->name = strdup(n);
-  result->label = (char*)strdup(l);
+  result->name = ((char*)strdup(n));
+  result->label = ((char*)strdup(l));
   result->parametres = p;
 
   result->corps = c;
@@ -40,7 +40,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m)
 
   if(strcmp(sc, "") == 0){
   /*parcours de la liste de classes pour chercher si elle existe deja, sinon on cree une classe qui a le bon nom*/
-  if(!listeClasses == NIL(VarDecl)){
+  if(!(listeClasses == ((VarDeclP)NIL(VarDecl)))){
    int i = 1;
    VarDeclP tmpList = listeClasses;
    while(i){
@@ -87,7 +87,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m)
 
 VarDeclP makeVar(char *name, char *type, enum e elmt){
   VarDeclP result = NEW(1, VarDecl);
-  result->name = strdup(name);
+  result->name = (char*)strdup(name);
 
 
   if(!strcmp(type, "Integer")){
@@ -123,20 +123,54 @@ Bool analyseSem(TreeP T){
 	if(!(T == NIL(Tree))){
 		/*TODO rajouter les declarations de classes, pour l'instant onne traite que les blocs*/
 
-		if(!analyseBloc(T->getChild(1));){
+		if(!analyseBloc(((TreeP)getChild(T, 1)))){
 			/*TODO erreur?*/
 		}
 	}
 	return TRUE;
 }
 
-/*analyse semantique d'un bloc, on veut pouvoir avoir acces a l'env des decls du bloc parent s'il existe, dans ce cas il faut les fusionner correctement tel qu'on ne modifie pas le bloc parent et qu'on masqu*/
+/*analyse semantique d'un bloc, on veut pouvoir avoir acces a l'env des decls du bloc parent s'il existe, dans ce cas il faut les fusionner correctement tel qu'on ne modifie pas le bloc parent et qu'on masque les variables du bloc parent*/
 
 Bool analyseBloc(TreeP T){
-	if(!portee(
+	if(!portee(((TreeP)getChild(T, 1)), ((TreeP)getChild(T, 0))->u.var)){
+		return FALSE;
+	}
+	return TRUE;
+}
+
+Bool portee(TreeP listinst, VarDeclP listdecl){
+	int i = 0;
+	for(i = 0; i<listinst->nbChildren; i++){
+		if(((TreeP)getChild(listinst, i))->op == Eidvar){
+			if(!contient(listdecl, ((TreeP)getChild(listinst, i))->u.str)){
+				return FALSE;
+			}
+		}else{
+			if(!portee(((TreeP)getChild(listinst, i)), listdecl)){return FALSE;}
+		}
+	}
+
+	return TRUE;
 }
 
 
+Bool contient(VarDeclP listdecl, char* name){
+	Bool fin = FALSE;
+	VarDeclP tmp = listdecl;
+
+	while(!fin){
+		if(!strcmp(tmp->name, name) == 0){return TRUE;}
+		else if (!(tmp->next == ((VarDeclP)NIL(VarDecl)))) {tmp = tmp->next;}
+		else {fin = TRUE;}
+	}
+	return FALSE;
+}
+
+
+Bool typage(TreeP T){
+return TRUE;
+}
 
 /************* le trucs du tp du prof TODO faudra voir si c'est utile*/
 extern int yyparse();
@@ -181,6 +215,7 @@ void setError(int code) {
  * Options: -[eE] -[vV] -[hH?]
  */
 int main(int argc, char **argv) {
+	printf("aled");
   int fi;
   int i, res;
 
@@ -355,7 +390,7 @@ void printExpr(TreeP tree) {
     printf("%s", tree->u.str); break;
   case Econst:
     printf("%d", tree->u.val); break;
-  case Eiteration:
+  case Eite:
     printf("[ITE "); printExpr(getChild(tree, 0)); /* la condition */
     printf(", "); printExpr(getChild(tree, 1)); /* la partie 'then' */
     printf(", "); printExpr(getChild(tree, 2)); /* la partie 'else' */
