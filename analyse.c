@@ -119,14 +119,26 @@ VarDeclP makeVar(char *name, char *type, enum e elmt){
 
 }
 
-VarDeclP makeListDecl(VarDeclP newvar, VarDeclP list){
-	if(!(list == NIL(VarDecl))){
-		newvar->next = list;
+Bool analyseSem(TreeP T){
+	if(!(T == NIL(Tree))){
+		/*TODO rajouter les declarations de classes, pour l'instant onne traite que les blocs*/
+
+		if(!analyseBloc(T->getChild(1));){
+			/*TODO erreur?*/
+		}
 	}
-	return newvar;
+	return TRUE;
+}
+
+/*analyse semantique d'un bloc, on veut pouvoir avoir acces a l'env des decls du bloc parent s'il existe, dans ce cas il faut les fusionner correctement tel qu'on ne modifie pas le bloc parent et qu'on masqu*/
+
+Bool analyseBloc(TreeP T){
+	if(!portee(
 }
 
 
+
+/************* le trucs du tp du prof TODO faudra voir si c'est utile*/
 extern int yyparse();
 extern int yylineno;
 
@@ -286,11 +298,18 @@ TreeP makeLeafStr(Etiquette op, char *str) {
   return(tree);
 }
 
+/* Constructeur de feuille pour une liste de variables. */
+TreeP makeLeafVar(Etiquette op, VarDeclP var){
+	TreeP tree = makeNode(0, op);
+	tree->u.var = var;
+	return(tree);
+}
+
 
 /* Verifie que nouv n'apparait pas deja dans list. l'ajoute en tete et
  * renvoie la nouvelle liste. 
  */
-VarDeclP addToScope(VarDeclP list, VarDeclP nouv) {
+VarDeclP addToScope(VarDeclP nouv, VarDeclP list) {
   VarDeclP p;
   for(p=list; p != NIL(VarDecl); p = p->next) {
     if (! strcmp(p->name, nouv->name)) {

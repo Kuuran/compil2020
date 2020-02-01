@@ -110,7 +110,7 @@ axiome:		%empty{$$ = NIL(Tree);}
 		|	
 		listclasse bloc {/*$$ = $1, $2;*/}
 		|
-		bloc{$$ = $1;}
+		bloc{$$ = makeTree(AXIOME, 2, makeTree(Evide, 0), $1);}
 		|
 		axiome error{
 			erreursyntx=true;
@@ -276,9 +276,9 @@ superieuregal: 		expression TOK_SUPERIEUREGAL expression{};
 inferieuregal: 		expression TOK_INFERIEUREGAL expression{};
 
 
-bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$=$2;}
+bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$= makeTree(Ebloc, 2, makeTree(Evide, 0), $2);}
 	|
-	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$= makeTree(Ebloc, 2, $2, $4);}
+	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$= makeTree(Ebloc, 2, makeLeafVar(Elist, $2), $4);}
 
 
 declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$ = makeVar($1, $3, INSTANCE);}
@@ -288,7 +288,7 @@ declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$ = makeVa
 affectation:		expression TOK_AFFECTATION expression TOK_POINTVIRGULE{$$ = makeTree(Eaff, 2, $1, $3);};
 
 
-listdeclarationvar: 	declarationvar listdeclarationvar{$$ = makeListDecl($1, $2);}
+listdeclarationvar: 	declarationvar listdeclarationvar{$$ = addToScope($1, $2);}
 			|
 			%empty{$$ = NIL(Tree);};
 

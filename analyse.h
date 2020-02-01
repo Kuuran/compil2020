@@ -22,6 +22,7 @@ typedef int Bool;
 typedef struct _Type Type, *TypeP;
 typedef struct _Class *ClassP;
 typedef struct _Methode *MethodeP;
+typedef struct _Decl *VarDeclP;
 
 /* Codes d'erreurs */
 #define NO_ERROR	0
@@ -37,9 +38,9 @@ typedef struct _Methode *MethodeP;
 typedef enum {
   Eadd, Eminus, Emult, Ediv,
   Eneq, Eeq, Esup, Esupeq, Einf, Einfeq,
-  Econst, Eidvar, Eaff,
+  Econst, Eidvar, Eaff, Estr,
   Eiteration, Edecl, Eclass, Enew, Eresult, Emethode, Eselect, Ethis, Esuper,
-  Ebloc, Elist
+  Ebloc, Elist, Evide, AXIOME
 } Etiquette;
 
 
@@ -67,7 +68,9 @@ typedef enum {
 #define	Esuper		22
 #define	Eaff		23
 #define	Elist		24
-
+#define Evide		25
+#define AXIOME		26
+#define Estr		27
 
 
 
@@ -80,6 +83,7 @@ typedef struct _Tree {
   union {
     char *str;         /* valeur de la feuille si op = Eidvar */
     int val;           /* valeur de la feuille si op = Econst */
+    VarDeclP var;
     struct _Tree **children; /* tableau des sous-arbres d'un noeud interne */
   } u;
 } Tree, *TreeP;
@@ -162,15 +166,16 @@ typedef union
 /* construction pour les AST */
 TreeP makeLeafStr(Etiquette op, char *str); 	    /* feuille (string) */
 TreeP makeLeafInt(Etiquette op, int val);	    /* feuille (int) */
+TreeP makeLeafVar(Etiquette op, VarDeclP var);	    /* feuille (liste de declarations)*/
 TreeP makeTree(Etiquette op, int nbChildren, ...);  /* noeud interne */
 ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, char* s, MethodeP m);
 MethodeP makeMethode(char *n, char *l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c); /*cree une methode*/
 VarDeclP makeVar(char *name, char *type, enum e elmt);
 
-VarDeclP makeListDecl(VarDeclP newvar, VarDeclP list);
+VarDeclP addToScope(VarDeclP nouv, VarDeclP list);
 
 VarDeclP listeClasses; /*stock toutes les classes déja faites pour permettre gerer les super classes*/
-VarDeclP listeDeclarations;
+VarDeclP varGlobales;
 
 
 /* Impression des AST */
@@ -185,8 +190,10 @@ void printAST(TreeP decls, TreeP main);
 /*fonction de lancement de l'analyse*/
 Bool analyseSem(TreeP T);
 
+Bool analyseBloc(TreeP T);
+
 /*Verification de la portee des variables d'un bloc*/
-Bool portee(VarDeclP listdecl);
+Bool portee(TreeP listinst, VarDeclP listdecl);
 
 /*Typage d'une expression*/
 Bool typage(TreeP T);
