@@ -28,50 +28,50 @@ extern bool erreurlex;
  
 
 
-%type<S>   axiome	
-%type<S>   listclasse	
-%type<S>   declclasse	
-%type<S>   interieurclasse	
-%type<S>   declconstructeur	
-%type<S>   listparamclass	
-%type<S>   paramclass	
-%type<S>   declattribut	
-%type<S>   declmethode	
-%type<S>   listparammethod	
-%type<S>   parammethod	
-%type<S>   listargs	
-%type<S>   expression
+%type<T>   axiome	
+%type<T>   listclasse	
+%type<D>   declclasse	
+%type<T>   interieurclasse	
+%type<D>   declconstructeur	
+%type<T>   listparamclass	
+%type<D>   paramclass	
+%type<D>   declattribut	
+%type<D>   declmethode	
+%type<T>   listparammethod	
+%type<T>   parammethod	
+%type<T>   listargs	
+%type<T>   expression
 %type<S>   identclass	
 %type<S>   identval	
-%type<S>   selection	
+%type<T>   selection	
 %type<S>   const	
-%type<S>   instanciation	
-%type<S>   envoimsg	
-%type<S>   expwithop	
-%type<S>   concat	
-%type<S>   nonegalite	
-%type<S>   egalite	
-%type<S>   moinsunaire	
-%type<S>   plusunaire	
-%type<S>   addition	
-%type<S>   soustraction	
-%type<S>   multiplication	
-%type<S>   superieur	
-%type<S>   inferieur	
-%type<S>   division	
-%type<S>   instruction	
-%type<S>   bloc	
-%type<S>   declarationvar	
-%type<S>   affectation	
-%type<S>   listdeclarationvar
-%type<S>   listinstructions	
-%type<S>   listinstructionsOpt
+%type<T>   instanciation	
+%type<T>   envoimsg	
+%type<T>   expwithop	
+%type<T>   concat	
+%type<T>   nonegalite	
+%type<T>   egalite	
+%type<T>   moinsunaire	
+%type<T>   plusunaire	
+%type<T>   addition	
+%type<T>   soustraction	
+%type<T>   multiplication	
+%type<T>   superieur	
+%type<T>   inferieur	
+%type<T>   division	
+%type<T>   instruction	
+%type<T>   bloc	
+%type<D>   declarationvar	
+%type<T>   affectation	
+%type<D>   listdeclarationvar
+%type<T>   listinstructions	
+%type<T>   listinstructionsOpt
 
 
 %token<S> TOK_CHAINECARAC
 %token<S> TOK_NOMCLASSE
 %token<S> TOK_NOM
-%token<S> TOK_NOMBRE
+%token<I> TOK_NOMBRE
 %token TOK_AFFECTATION
 %token TOK_PARENTHESED
 %token TOK_PARENTHESEG
@@ -185,9 +185,9 @@ listargs: 		expression TOK_VIRGULE listargs{}
 
 expression:		identclass{/*$$ = $1;*/} 
 			|
-			identval{$$ = $1;}
+			identval{$$ = makeLeafStr(Eidvar, $1);}
 			|
-			const{$$ = $1;}
+			const{$$ = makeLeafStr(Econst, $1);}
 			|
 			TOK_PARENTHESEG TOK_AS identclass TOK_DEUXPOINTS expression TOK_PARENTHESED{}
 			|
@@ -211,25 +211,24 @@ instruction:	affectation{$$ = $1;}
 		|
 		TOK_IF expression TOK_THEN instruction TOK_ELSE instruction{/*$$=$1,$4,$6*/};
 
-identclass: 
-			TOK_NOMCLASSE{/*$$ = makeLeafStr(, $1);*/};
+identclass: 		TOK_NOMCLASSE{$$ = $1;}
 	
-identval: 		TOK_THIS{/*$$ = makeLeafStr(, $1);*/}
+identval: 		TOK_THIS{$$ = "this";}
 			|
-			TOK_SUPER{/*$$ = makeLeafStr(, $1);*/}
+			TOK_SUPER{$$ = "super";}
            		|
-        		TOK_RESULT{/*$$ = makeLeafStr(, $1);*/}
+        		TOK_RESULT{$$ = "result";}
 			|
-			TOK_NOM {$$ = makeLeafStr(Eidvar, $1);}
+			TOK_NOM {$$ = $1;}
 
 
 selection:		expression TOK_POINT identval{}
 
 
 
-const:			TOK_CHAINECARAC{$$=makeLeafStr(Econst , $1);}
+const:			TOK_CHAINECARAC{$$ = $1;}
 			|
-			TOK_NOMBRE{$$=makeLeafStr(Econst , $1);};
+			TOK_NOMBRE{$$ = $1;};
 
 instanciation:		TOK_NEW identclass TOK_PARENTHESEG listargs TOK_PARENTHESED{};
 
@@ -267,7 +266,7 @@ nonegalite: 		expression TOK_DIFFERENCE expression{};
 egalite: 		expression TOK_EGALITE expression{};
 moinsunaire: 		TOK_MOINS expression{};
 plusunaire: 		TOK_PLUS expression{};
-addition: 		expression TOK_PLUS expression{};
+addition: 		expression TOK_PLUS expression{$$ = makeTree(Eadd, 2, $1, $3);};
 soustraction: 		expression TOK_MOINS expression{};
 multiplication: 	expression TOK_FOIS expression{};
 superieur: 		expression TOK_SUPERIEUR expression{};
@@ -279,24 +278,24 @@ inferieuregal: 		expression TOK_INFERIEUREGAL expression{};
 
 bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$=$2;}
 	|
-	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$=$2,$4;}
+	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$= makeTree(Ebloc, 2, $2, $4);}
 
 
-declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{}
+declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$ = makeVar($1, $3, INSTANCE);}
 			|
 			identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{};
 
-affectation:		expression TOK_AFFECTATION expression TOK_POINTVIRGULE{};
+affectation:		expression TOK_AFFECTATION expression TOK_POINTVIRGULE{$$ = makeTree(Eaff, 2, $1, $3);};
 
 
-listdeclarationvar: 	declarationvar listdeclarationvar{}
+listdeclarationvar: 	declarationvar listdeclarationvar{$$ = makeListDecl($1, $2);}
 			|
 			%empty{$$ = NIL(Tree);};
 
-listinstructionsOpt:	instruction listinstructionsOpt{}
+listinstructionsOpt:	instruction listinstructionsOpt{$$ = makeTree(Elist, 2, $1, $2);}
 			|
 			%empty{$$ = NIL(Tree);};
-listinstructions:       instruction listinstructionsOpt{};
+listinstructions:       instruction listinstructionsOpt{$$ = makeTree(Elist, 2, $1, $2);};
 
 %%
 

@@ -9,11 +9,11 @@
 
 
 
-MethodeP makeMethode(char*n, char*l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c)
+MethodeP makeMethode(char* n, char* l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c)
 {/*TODO c'est nul, a refaire*/
   MethodeP result = NEW(1, Methode);
   result->name = strdup(n);
-  result->label = strdup(l);
+  result->label = (char*)strdup(l);
   result->parametres = p;
 
   result->corps = c;
@@ -113,11 +113,18 @@ VarDeclP makeVar(char *name, char *type, enum e elmt){
 
   result->elmt = elmt;
   
+
+
   return result;
 
 }
 
-
+VarDeclP makeListDecl(VarDeclP newvar, VarDeclP list){
+	if(!(list == NIL(VarDecl))){
+		newvar->next = list;
+	}
+	return newvar;
+}
 
 
 extern int yyparse();

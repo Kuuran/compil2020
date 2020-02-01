@@ -37,8 +37,9 @@ typedef struct _Methode *MethodeP;
 typedef enum {
   Eadd, Eminus, Emult, Ediv,
   Eneq, Eeq, Esup, Esupeq, Einf, Einfeq,
-  Econst, Eidvar,
-  Eiteration, Edecl, Eclass, Enew, Eresult, Emethode, Eselect
+  Econst, Eidvar, Eaff,
+  Eiteration, Edecl, Eclass, Enew, Eresult, Emethode, Eselect, Ethis, Esuper,
+  Ebloc, Elist
 } Etiquette;
 
 
@@ -61,8 +62,11 @@ typedef enum {
 #define	Eresult		17
 #define	Emethode	18
 #define	Eselect		19
-
-
+#define Ebloc		20
+#define	Ethis		21
+#define	Esuper		22
+#define	Eaff		23
+#define	Elist		24
 
 
 
@@ -92,6 +96,15 @@ typedef struct _Decl
   enum e {PARAM, PARAMVAR, CHAMP, INSTANCE, THIS, RESULT, CLASSE, UNKNOWN} elmt;
   struct _Decl *next;
 } VarDecl, *VarDeclP;
+
+#define	PARAM		1
+#define	PARAMVAR	2
+#define	CHAMP		3
+#define	INSTANCE	4
+#define	THIS		5
+#define	RESULT		6
+#define	CLASSE		7
+#define	UNKNOWN		8
 
 typedef struct _Type
 {
@@ -154,9 +167,45 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP champs, char* s, MethodeP m);
 MethodeP makeMethode(char *n, char *l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c); /*cree une methode*/
 VarDeclP makeVar(char *name, char *type, enum e elmt);
 
+VarDeclP makeListDecl(VarDeclP newvar, VarDeclP list);
+
 VarDeclP listeClasses; /*stock toutes les classes déja faites pour permettre gerer les super classes*/
 VarDeclP listeDeclarations;
 
 
 /* Impression des AST */
 void printAST(TreeP decls, TreeP main);
+
+
+
+/*fonctions pour l'analyse semantique*/
+
+
+
+/*fonction de lancement de l'analyse*/
+Bool analyseSem(TreeP T);
+
+/*Verification de la portee des variables d'un bloc*/
+Bool portee(VarDeclP listdecl);
+
+/*Typage d'une expression*/
+Bool typage(TreeP T);
+
+/**/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
