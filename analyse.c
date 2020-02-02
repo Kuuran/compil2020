@@ -136,6 +136,9 @@ Bool analyseBloc(TreeP T){
 	if(!portee(((TreeP)getChild(T, 1)), ((TreeP)getChild(T, 0))->u.var)){
 		return FALSE;
 	}
+	else if(!typage(((TreeP)getChild(T, 0)), ((TreeP)getChild(T, 1))->u.var)){
+		return FALSE;
+	}
 	return TRUE;
 }
 
@@ -170,28 +173,46 @@ Bool contient(VarDeclP listdecl, char* name){
 }
 
 
-enum _t typage(TreeP T){
+enum _t typage(TreeP T, VarDeclP listdecl){
 	switch(T->op){
 		case Eadd : case Eminus : case Emult : case Ediv : case Esup: case Esupeq : case  Einf: case Einfeq : {
-			if((typage(getChild(T, 0)) == INTEGER) && (typage(getChild(T, 1)) == INTEGER)){
+			if((typage(getChild(T, 0), listdecl) == INTEGER) && (typage(getChild(T, 1), listdecl) == INTEGER)){
 				return INTEGER;
 			}
 			else{return FALSE;}
 			break;
 		}
 
+		case Eaddu : case Eminusu :{
+			if((typage(getChild(T, 0), listdecl) == INTEGER)) return INTEGER;
+			else return FALSE;
+			break;
+		}
+
 		case Eneq : case Eeq :{
-			if((typage(getChild(T, 0)) == INTEGER) && (typage(getChild(T, 1)) == INTEGER)){
+			if((typage(getChild(T, 0), listdecl) == INTEGER) && (typage(getChild(T, 1), listdecl) == INTEGER)){
 				return INTEGER;
 			}
-			else if((typage(getChild(T, 0)) == STRING) && (typage(getChild(T, 1)) == STRING)){
+			else if((typage(getChild(T, 0), listdecl) == STRING) && (typage(getChild(T, 1), listdecl) == STRING)){
 				return STRING;
 			}
 			else{return FALSE;}
 			break;
 		}
+
+		case Econcat :{
+			if((typage(getChild(T, 0), listdecl) == STRING) && (typage(getChild(T, 1), listdecl) == STRING)){
+				return STRING;
+			}
+			else{return FALSE;}
+			break;
+		}
+
 		case Econst : return INTEGER; break;
 		case Estr : return STRING; break;
+
+		case Eidvar :{}
+
 
 		default : return FALSE; break;
 	}

@@ -37,9 +37,9 @@ typedef struct _Decl *VarDeclP;
 /*TODO a modif*/
 /* Etiquettes pour les arbres de syntaxe abstraite */
 typedef enum {
-  Eadd, Eminus, Emult, Ediv,
+  Eadd, Eminus, Emult, Ediv, Eaddu, Eminusu,
   Eneq, Eeq, Esup, Esupeq, Einf, Einfeq,
-  Econst, Eidvar, Eaff, Estr,
+  Econst, Eidvar, Eaff, Estr, Econcat,
   Eite, Edecl, Eclass, Enew, Eresult, Emethode, Eselect, Ethis, Esuper,
   Ebloc, Elist, Evide, AXIOME
 } Etiquette;
@@ -72,6 +72,9 @@ typedef enum {
 #define Evide		25
 #define AXIOME		26
 #define Estr		27
+#define Eaddu		28
+#define Eminusu		29
+#define Econcat		30
 
 
 
@@ -203,7 +206,7 @@ Bool portee(TreeP listinst, VarDeclP listdecl);
 Bool contient(VarDeclP listdecl, char* name);
 
 /*Typage d'une expression*/
-enum _t typage(TreeP T);
+enum _t typage(TreeP T, VarDeclP listdecl);
 
 /**/
 

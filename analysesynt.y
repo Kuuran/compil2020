@@ -58,7 +58,9 @@ extern bool erreurlex;
 %type<T>   multiplication	
 %type<T>   superieur	
 %type<T>   inferieur	
-%type<T>   division	
+%type<T>   division
+%type<T>   superieuregal
+%type<T>   inferieuregal
 %type<T>   instruction	
 %type<T>   bloc	
 %type<D>   declarationvar	
@@ -258,23 +260,23 @@ expwithop:		superieur{$$ = $1;}
 			|
 			division{$$ = $1;}
 			|
-			superieuregal{/*$$ = $1;*/}
+			superieuregal{$$ = $1;}
 			|
-			inferieuregal{/*$$ = $1;*/};
+			inferieuregal{$$ = $1;};
 
-concat: 		expression TOK_CONCAT expression{};
-nonegalite: 		expression TOK_DIFFERENCE expression{};
-egalite: 		expression TOK_EGALITE expression{};
-moinsunaire: 		TOK_MOINS expression{};
-plusunaire: 		TOK_PLUS expression{};
+concat: 		expression TOK_CONCAT expression{$$ = makeTree(Econcat, 2, $1, $3);};
+nonegalite: 		expression TOK_DIFFERENCE expression{$$ = makeTree(Eneq, 2, $1, $3);};
+egalite: 		expression TOK_EGALITE expression{$$ = makeTree(Eeq, 2, $1, $3);};
+moinsunaire: 		TOK_MOINS expression{$$ = makeTree(Eaddu, 1, $2);};
+plusunaire: 		TOK_PLUS expression{$$ = makeTree(Eminusu, 1, $2);};
 addition: 		expression TOK_PLUS expression{$$ = makeTree(Eadd, 2, $1, $3);};
-soustraction: 		expression TOK_MOINS expression{};
-multiplication: 	expression TOK_FOIS expression{};
-superieur: 		expression TOK_SUPERIEUR expression{};
-inferieur: 		expression TOK_INFERIEUR expression{};
-division: 		expression TOK_DIVISION expression{};
-superieuregal: 		expression TOK_SUPERIEUREGAL expression{};
-inferieuregal: 		expression TOK_INFERIEUREGAL expression{};
+soustraction: 		expression TOK_MOINS expression{$$ = makeTree(Eminus, 2, $1, $3);};
+multiplication: 	expression TOK_FOIS expression{$$ = makeTree(Emult, 2, $1, $3);};
+superieur: 		expression TOK_SUPERIEUR expression{$$ = makeTree(Esup, 2, $1, $3);};
+inferieur: 		expression TOK_INFERIEUR expression{$$ = makeTree(Einf, 2, $1, $3);};
+division: 		expression TOK_DIVISION expression{$$ = makeTree(Ediv, 2, $1, $3);};
+superieuregal: 		expression TOK_SUPERIEUREGAL expression{$$ = makeTree(Esupeq, 2, $1, $3);};
+inferieuregal: 		expression TOK_INFERIEUREGAL expression{$$ = makeTree(Einfeq, 2, $1, $3);};
 
 
 bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$= makeTree(Ebloc, 2, makeTree(Evide, 0), $2);}
