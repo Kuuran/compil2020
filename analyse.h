@@ -6,6 +6,7 @@
 int yylex(void);
 void yyerror(char*);
 
+extern char *strdup(const char *s);
 
 /* deux macros pratiques, utilisees dans les allocations de structure
  * Pour NEW on donne le nombre et le type de la stucture a allouer (pas le type
@@ -112,7 +113,7 @@ typedef struct _Decl
 
 typedef struct _Type
 {
-  enum {CLASS, STRING, INTEGER} t;
+  enum _t {CLASS, STRING, INTEGER} t;
   union{
 	ClassP classe;
 	char *string;
@@ -120,7 +121,9 @@ typedef struct _Type
 	} u;
 } Type, *TypeP;
 
-
+#define	CLASS	1
+#define	STRING	2
+#define	INTEGER	3
 
 typedef struct _Class
 { char *name;
@@ -200,7 +203,7 @@ Bool portee(TreeP listinst, VarDeclP listdecl);
 Bool contient(VarDeclP listdecl, char* name);
 
 /*Typage d'une expression*/
-Bool typage(TreeP T);
+enum _t typage(TreeP T);
 
 /**/
 

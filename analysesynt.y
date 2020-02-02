@@ -44,7 +44,7 @@ extern bool erreurlex;
 %type<S>   identclass	
 %type<S>   identval	
 %type<T>   selection	
-%type<S>   const	
+%type<T>   const	
 %type<T>   instanciation	
 %type<T>   envoimsg	
 %type<T>   expwithop	
@@ -71,7 +71,7 @@ extern bool erreurlex;
 %token<S> TOK_CHAINECARAC
 %token<S> TOK_NOMCLASSE
 %token<S> TOK_NOM
-%token<S> TOK_NOMBRE
+%token<I> TOK_NOMBRE
 %token TOK_AFFECTATION
 %token TOK_PARENTHESED
 %token TOK_PARENTHESEG
@@ -188,7 +188,7 @@ expression:		identclass{/*$$ = $1;*/}
 			|
 			identval{$$ = makeLeafStr(Eidvar, $1);}
 			|
-			const{$$ = makeLeafStr(Econst, $1);}
+			const{$$ = $1;}
 			|
 			TOK_PARENTHESEG TOK_AS identclass TOK_DEUXPOINTS expression TOK_PARENTHESED{}
 			|
@@ -227,9 +227,9 @@ selection:		expression TOK_POINT identval{}
 
 
 
-const:			TOK_CHAINECARAC{$$ = $1;}
+const:			TOK_CHAINECARAC{$$ = makeLeafStr(Estr, $1);}
 			|
-			TOK_NOMBRE{$$ = $1;};
+			TOK_NOMBRE{$$ = makeLeafInt(Econst, $1);};
 
 instanciation:		TOK_NEW identclass TOK_PARENTHESEG listargs TOK_PARENTHESED{};
 
@@ -282,7 +282,7 @@ bloc:	TOK_CROCHETG listinstructionsOpt TOK_CROCHETD{$$= makeTree(Ebloc, 2, makeT
 	TOK_CROCHETG listdeclarationvar TOK_IS listinstructions TOK_CROCHETD{$$= makeTree(Ebloc, 2, makeLeafVar(Elist, $2), $4);}
 
 
-declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$ = makeVar($1, $3, INSTANCE);}
+declarationvar:		identval TOK_DEUXPOINTS identclass TOK_POINTVIRGULE{$$ = makeVar((char*)$1, (char*)$3, INSTANCE);}
 			|
 			identval TOK_DEUXPOINTS identclass TOK_AFFECTATION expression TOK_POINTVIRGULE{};
 
@@ -295,7 +295,7 @@ listdeclarationvar: 	declarationvar listdeclarationvar{$$ = addToScope($1, $2);}
 
 listinstructionsOpt:	instruction listinstructionsOpt{$$ = makeTree(Elist, 2, $1, $2);}
 			|
-			%empty{$$ = NIL(Tree);};
+			%empty{$$ = makeTree(Evide, 0);};
 listinstructions:       instruction listinstructionsOpt{$$ = makeTree(Elist, 2, $1, $2);};
 
 %%

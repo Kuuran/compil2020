@@ -9,7 +9,7 @@
 int lineno= 1;
 bool erreurlex=false;
 extern YYSTYPE yylval;
-
+extern char *strdup(const char *s);
 
 %}
 
@@ -77,6 +77,7 @@ return TOK_CHAINECARAC;
 
 {nomClasse} {
 yylval.S = strdup(yytext);
+/*strcpy(yylval.S, yytext);*/
 return TOK_NOMCLASSE;
 }
 {nom} {

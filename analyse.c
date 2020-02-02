@@ -12,8 +12,8 @@
 MethodeP makeMethode(char* n, char* l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c)
 {/*TODO c'est nul, a refaire*/
   MethodeP result = NEW(1, Methode);
-  result->name = ((char*)strdup(n));
-  result->label = ((char*)strdup(l));
+  result->name = strdup(n);
+  result->label = strdup(l);
   result->parametres = p;
 
   result->corps = c;
@@ -87,8 +87,8 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m)
 
 VarDeclP makeVar(char *name, char *type, enum e elmt){
   VarDeclP result = NEW(1, VarDecl);
-  result->name = (char*)strdup(name);
-
+  result->name = strdup(name);
+  result->val = NEW(1, Type);
 
   if(!strcmp(type, "Integer")){
 	result->val->t = INTEGER;
@@ -141,6 +141,8 @@ Bool analyseBloc(TreeP T){
 
 Bool portee(TreeP listinst, VarDeclP listdecl){
 	int i = 0;
+	
+	if(!(listinst->op == Evide)){
 	for(i = 0; i<listinst->nbChildren; i++){
 		if(((TreeP)getChild(listinst, i))->op == Eidvar){
 			if(!contient(listdecl, ((TreeP)getChild(listinst, i))->u.str)){
@@ -150,7 +152,7 @@ Bool portee(TreeP listinst, VarDeclP listdecl){
 			if(!portee(((TreeP)getChild(listinst, i)), listdecl)){return FALSE;}
 		}
 	}
-
+	}
 	return TRUE;
 }
 
@@ -168,8 +170,31 @@ Bool contient(VarDeclP listdecl, char* name){
 }
 
 
-Bool typage(TreeP T){
-return TRUE;
+enum _t typage(TreeP T){
+	switch(T->op){
+		case Eadd : case Eminus : case Emult : case Ediv : case Esup: case Esupeq : case  Einf: case Einfeq : {
+			if((typage(getChild(T, 0)) == INTEGER) && (typage(getChild(T, 1)) == INTEGER)){
+				return INTEGER;
+			}
+			else{return FALSE;}
+			break;
+		}
+
+		case Eneq : case Eeq :{
+			if((typage(getChild(T, 0)) == INTEGER) && (typage(getChild(T, 1)) == INTEGER)){
+				return INTEGER;
+			}
+			else if((typage(getChild(T, 0)) == STRING) && (typage(getChild(T, 1)) == STRING)){
+				return STRING;
+			}
+			else{return FALSE;}
+			break;
+		}
+		case Econst : return INTEGER; break;
+		case Estr : return STRING; break;
+
+		default : return FALSE; break;
+	}
 }
 
 /************* le trucs du tp du prof TODO faudra voir si c'est utile*/
@@ -215,7 +240,6 @@ void setError(int code) {
  * Options: -[eE] -[vV] -[hH?]
  */
 int main(int argc, char **argv) {
-	printf("aled");
   int fi;
   int i, res;
 
