@@ -213,6 +213,8 @@ void code(TreeP ast, VarDeclP list) {
                 break;
             case Ebloc:
                 code(getChild(ast,0)->u.var,getChild(ast,1));
+
+                //TODO récupérer "findelisteP"
 		}
     }
 }
