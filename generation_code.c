@@ -9,11 +9,6 @@ typedef struct _HashMap {
 
 HashMapP findelisteP;           /*récupère le dernier élément de ma liste HashMap*/
 
-//TODO crée liste
-// en longeant l'arbre ; des que j'apercois une liste de déclaration / une déclaration je remplie ma liste de hashage avec valeur et itération
-// faire ALLOC
-
-
 
 
 void debut_code() {
@@ -28,47 +23,54 @@ void fin_code() {
 
 int git;            //récupère l'@ de stockage pour une affectation
 
+HashMapP *hash;           /*initialisation HashMap*/
+hash[0] = NEW(1, HashMap);
+int i=0;
+
 void code(TreeP ast, VarDeclP list) {
+
+    HashMapP buffer = hash[i];
+    VarDeclP bufList = list;
+
+    while(bufList->next != NIL(VarDeclP)){
+        buffer->addr = i;
+        buffer->nom = list->name;
+        fprint(fichier,"\t ALLOC %d \n", 1);
+        i++;
+        buffer->next = NEW(1, HashMap);
+        buffer = buffer->next;
+        bufList = bufList->next;
+    }
+
     if(ast) {
         switch(ast->op) { // On switch à partir de l'étiquette de l'AST ?
 			case AXIOME:
-				if(ast->getChild(ast,0)->op == Evide)){             /*cas ou axiome vide*/
-                    //fprintf(fichier, "\t START \n");
+				if(getChild(ast,0)->op == Evide)){              /*cas ou axiome vide*/
                     fprint(fichier,"\t NOP \n" );
-                    //fprintf(fichier, "\t STOP \n");
-				}else if(ast->getChild(ast,0)->op == Ebloc){        /*cas ou juste un bloc*/
-                    //fprintf(fichier, "\t START \n");
-                    code(ast->getChild(ast,0),list);
-                    //fprintf(fichier, "\t STOP \n");
-                }else {                                             /*cas ou on a une liste de classe suivi d'un bloc*/
-                    //fprintf(fichier, "\t START \n");
-                    code(ast->getChild(ast,0),ast->getChild(ast,1));                /*TODO revoir le cas de la liste de classe comment le prendre en compte ici*/
-                    //fprintf(fichier, "\t STOP \n";
+				}else if(getChild(ast,0)->op == Ebloc){         /*cas ou juste un bloc*/
+                    code(getChild(ast,0),getChild(getChild(ast,0),0)->u.var);
+                }else {                                         /*cas ou on a une liste de classe suivi d'un bloc*/
+                    code(getChild(ast,0),getChild(getChild(ast,0),0)->u.var);
                 }
 				break;
-			case Eite:                                              /*if then else*/
-				code(ast->getChild(ast,0),list);
+			case Eite:                                          /*if then else*/
+				code(getChild(ast,0),list);
 				fprint(fichier, "\t JZ else \n");  				/*else = label rentre dans le else*/
-				code(ast->getChild(ast,1),list);
+				code(getChild(ast,1),list);
 				fprint(fichier, "\t JUMP fin \n");				/*fin = label fin instruction*/=
 				fprint(fichier, "\t else NOP \n");
-				code(ast->getChild(ast,2),list);
+				code(getChild(ast,2),list);
 				fprint(fichier, "\t fin NOP \n");
 				break;
 			case Eidvar:
-			    int iteX=-1;
-			    VarDeclP buffer = list;
-			    while(buffer != NIL(VarDecl)){
-			        iteX++;
-			        //todo alloc la variable parcouru
-			        //todo remplir liste de hash avec la valeur et l'itération = @ de mon élément
-			        if(strcmp(buffer->name , ast->u.str)){
-			            git = iteX;
+			    buffer = hash[0];
+			    while(buffer != NIL(HashMap)){
+			        if(strcmp(buffer->nom , ast->u.str)){
 			            break;
 			        }
 			        buffer = buffer->next;
 			    }
-				fprintf(fichier, "\t PUSHG %s \n", iteX);
+				fprintf(fichier, "\t PUSHG %s \n", buffer->addr);
 				break;
 			case Econst:
 				fprintf(fichier, "\t PUSHI %d \n", ast->u.val);
@@ -77,82 +79,114 @@ void code(TreeP ast, VarDeclP list) {
 				fprintf(fichier, "\t PUSHS %s \n", ast->u.str);
 				break;
 			case Eaff:
-				code(ast->getChild(ast,0), list);
-				code(ast->getChild(ast,1),list);
+				code(getChild(ast,0), list);
+				code(getChild(ast,1),list);
 				fprintf(fichier, "\t STOREG %s \n", git);
 				break;
 			case Eadd:
-				code(ast->getChild(ast,0));
-				code(ast->getChild(ast,1));
+				code(getChild(ast,0));
+				code(getChild(ast,1));
 				fprintf(fichier, "\t ADD \n");
 				break;
             case Eaddu:
-                code(ast->getChild(ast,0),list);
+                code(getChild(ast,0),list);
                 fprint(fichier, "\t PUSHI %d \n", 1);
                 fprintf(fichier, "\t ADD \n");
                 break;
             case Eminus:
-				code(ast->getChild(ast,0));
-				code(ast->getChild(ast,1));
+				code(getChild(ast,0));
+				code(getChild(ast,1));
 				fprintf(fichier, "\t SUB \n");
 				break;
             case Eminusu:
-                code(ast->getChild(ast,0),list);
+                code(getChild(ast,0),list);
                 fprint(fichier, "\t PUSHI %d \n", 1);
                 fprintf(fichier, "\t SUB \n");
                 break;
 			case Emult:
-				code(ast->getChild(ast,0));
-				code(ast->getChild(ast,1));
+				code(getChild(ast,0));
+				code(getChild(ast,1));
 				fprintf(fichier, "\t MUL \n");
 				break;
 			case Ediv:
-				code(ast->getChild(ast,0));
-				code(ast->getChild(ast,1));
+				code(getChild(ast,0));
+				code(getChild(ast,1));
 				fprintf(fichier, "\t DIV \n");
 				break;
 			case Eneq:
-				if(typage(ast) == 3){               //test d'égalité dans le cas des integer
-                    code(ast->getChild(ast,0),list);
-                    code(ast->getChild(ast,1),list);
+				if(typage(ast) == INTEGER){               //test d'égalité dans le cas des integer
+                    code(getChild(ast,0),list);
+                    code(getChild(ast,1),list);
                     fprint(fichier, "\t EQUAL \n");
                     fprint(fichier, "\t NOT \n");
                     break;
                 }else {                             //test d'égalité dans le cas des string
-				    //TODO prendre la liste des string la comparer
+                    buffer = hash[0];
+                    while(buffer != NIL(HashMap)){
+                        if(strcmp(buffer->nom , ast->u.str)){
+                            break;
+                        }
+                        buffer = buffer->next;
+                    }
+                    fprintf(fichier, "\t LOAD %s \n", buffer->addr);
+
+                    buffer2 = hash[0];
+                    while(buffer2 != NIL(HashMap)){
+                        if(strcmp(buffer2->nom , ast->u.str)){
+                            break;
+                        }
+                        buffer2 = buffer2->next;
+                    }
+                    fprintf(fichier, "\t LOAD %s \n", buffer2->addr);
                     fprint(fichier, "\t EQUAL \n");
                     fprint(fichier, "\t NOT \n");
                     break;
 				}
             case Eeq:
-                if(typage(ast,list) == 3){               //test d'égalité dans le cas des integer
-                    code(ast->getChild(ast,0),list);
-                    code(ast->getChild(ast,1),list);
+                if(typage(ast,list) == INTEGER){               //test d'égalité dans le cas des integer
+                    code(getChild(ast,0),list);
+                    code(getChild(ast,1),list);
                     fprint(fichier, "\t EQUAL \n");
                     break;
                 }else {                             //test d'égalité dans le cas des string
-                    //TODO prendre la liste des string la comparer
+                    buffer = hash[0];
+                    while(buffer != NIL(HashMap)){
+                        if(strcmp(buffer->nom , ast->u.str)){
+                            break;
+                        }
+                        buffer = buffer->next;
+                    }
+                    fprintf(fichier, "\t LOAD %s \n", buffer->addr);
+
+                    buffer2 = hash[0];
+                    while(buffer2 != NIL(HashMap)){
+                        if(strcmp(buffer2->nom , ast->u.str)){
+                            break;
+                        }
+                        buffer2 = buffer2->next;
+                    }
+                    fprintf(fichier, "\t LOAD %s \n", buffer2->addr);
                     fprint(fichier, "\t EQUAL \n");
                     break;
                 }
             case Esup:
-                code(ast->getChild(ast,0),list);
-                code(ast->getChild(ast,1),list);
+                code(getChild(ast,0),list);
+                code(getChild(ast,1),list);
                 fprint(fichier, "\t SUP \n");
                 break;
             case Einf:
-                code(ast->getChild(ast,0),list);
-                code(ast->getChild(ast,1),list);
+                code(getChild(ast,0),list);
+                code(getChild(ast,1),list);
                 fprint(fichier, "\t INF \n");
                 break;
             case Einfeq:
-                code(ast->getChild(ast,0),list);
-                code(ast->getChild(ast,1),list);
+                code(getChild(ast,0),list);
+                code(getChild(ast,1),list);
                 fprint(fichier, "\t SUPEQ \n");
                 break;
             case Esupeq:
-                code(ast->getChild(ast,0),list);
-                code(ast->getChild(ast,1),list);
+                code(getChild(ast,0),list);
+                code(getChild(ast,1),list);
                 fprint(fichier, "\t INFEQ \n");
                 break;
             case Evide:
@@ -162,3 +196,5 @@ void code(TreeP ast, VarDeclP list) {
 }
 
 /*TODO faire la génération de code des classes en prenant en compte les différents ALLOC*/
+/*Enew : alloue espace mémoire pour une classe*/
+/*Emethode : alloue espace mémoire pour une méthode*/
