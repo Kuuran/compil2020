@@ -44,25 +44,25 @@ void code(TreeP ast, VarDeclP list) {
 
     if(ast) {
         switch(ast->op) { // On switch à partir de l'étiquette de l'AST ?
-			case AXIOME:
-				if(getChild(ast,0)->op == Evide)){              /*cas ou axiome vide*/
+			case AXIOME:                                                             /*génération code axiome*/
+				if(getChild(ast,0)->op == Evide)){                                      /*cas ou axiome vide*/
                     fprint(fichier,"\t NOP \n" );
-				}else if(getChild(ast,0)->op == Ebloc){         /*cas ou juste un bloc*/
+				}else if(getChild(ast,0)->op == Ebloc){                                 /*cas ou juste un bloc*/
                     code(getChild(ast,0),getChild(getChild(ast,0),0)->u.var);
-                }else {                                         /*cas ou on a une liste de classe suivi d'un bloc*/
+                }else {                                                                 /*cas ou on a une liste de classe suivi d'un bloc*/
                     code(getChild(ast,0),getChild(getChild(ast,0),0)->u.var);
                 }
 				break;
-			case Eite:                                          /*if then else*/
+			case Eite:                                                              /*génération code if then else*/
 				code(getChild(ast,0),list);
-				fprint(fichier, "\t JZ else \n");  				/*else = label rentre dans le else*/
+				fprint(fichier, "\t JZ else \n");  				                        /*else = label rentre dans le else*/
 				code(getChild(ast,1),list);
-				fprint(fichier, "\t JUMP fin \n");				/*fin = label fin instruction*/=
+				fprint(fichier, "\t JUMP fin \n");				                        /*fin = label fin instruction*/=
 				fprint(fichier, "\t else NOP \n");
 				code(getChild(ast,2),list);
 				fprint(fichier, "\t fin NOP \n");
 				break;
-			case Eidvar:
+			case Eidvar:                                                            /*génération code : récupère élément en mémoire*/
 			    buffer = hash[0];
 			    while(buffer != NIL(HashMap)){
 			        if(strcmp(buffer->nom , ast->u.str)){
@@ -72,55 +72,55 @@ void code(TreeP ast, VarDeclP list) {
 			    }
 				fprintf(fichier, "\t PUSHG %s \n", buffer->addr);
 				break;
-			case Econst:
+			case Econst:                                                            /*génération code déclaration constante*/
 				fprintf(fichier, "\t PUSHI %d \n", ast->u.val);
 				break;
-			case Estr:
+			case Estr:                                                              /*génération code déclaration string*/
 				fprintf(fichier, "\t PUSHS %s \n", ast->u.str);
 				break;
-			case Eaff:
+			case Eaff:                                                              /*génération code affectation*/
 				code(getChild(ast,0), list);
 				code(getChild(ast,1),list);
 				fprintf(fichier, "\t STOREG %s \n", git);
 				break;
-			case Eadd:
+			case Eadd:                                                              /*génération code addition*/
 				code(getChild(ast,0));
 				code(getChild(ast,1));
 				fprintf(fichier, "\t ADD \n");
 				break;
-            case Eaddu:
+            case Eaddu:                                                             /*génération code itération ++*/
                 code(getChild(ast,0),list);
                 fprint(fichier, "\t PUSHI %d \n", 1);
                 fprintf(fichier, "\t ADD \n");
                 break;
-            case Eminus:
+            case Eminus:                                                            /*génération code soustraction*/
 				code(getChild(ast,0));
 				code(getChild(ast,1));
 				fprintf(fichier, "\t SUB \n");
 				break;
-            case Eminusu:
+            case Eminusu:                                                           /*génération code itération -- */
                 code(getChild(ast,0),list);
                 fprint(fichier, "\t PUSHI %d \n", 1);
                 fprintf(fichier, "\t SUB \n");
                 break;
-			case Emult:
+			case Emult:                                                             /*génération code multiplication*/
 				code(getChild(ast,0));
 				code(getChild(ast,1));
 				fprintf(fichier, "\t MUL \n");
 				break;
-			case Ediv:
+			case Ediv:                                                              /*génération code division*/
 				code(getChild(ast,0));
 				code(getChild(ast,1));
 				fprintf(fichier, "\t DIV \n");
 				break;
-			case Eneq:
-				if(typage(ast) == INTEGER){               //test d'égalité dans le cas des integer
+			case Eneq:                                                              /*génération code inégalité*/
+				if(typage(ast) == INTEGER){                                             /*test d'égalité dans le cas des integer*/
                     code(getChild(ast,0),list);
                     code(getChild(ast,1),list);
                     fprint(fichier, "\t EQUAL \n");
                     fprint(fichier, "\t NOT \n");
                     break;
-                }else {                             //test d'égalité dans le cas des string
+                }else {                                                                 /*test d'égalité dans le cas des string*/
                     buffer = hash[0];
                     while(buffer != NIL(HashMap)){
                         if(strcmp(buffer->nom , ast->u.str)){
@@ -142,13 +142,13 @@ void code(TreeP ast, VarDeclP list) {
                     fprint(fichier, "\t NOT \n");
                     break;
 				}
-            case Eeq:
-                if(typage(ast,list) == INTEGER){               //test d'égalité dans le cas des integer
+            case Eeq:                                                              /*génération code égalité*/
+                if(typage(ast,list) == INTEGER){                                        /*test d'égalité dans le cas des integer*/
                     code(getChild(ast,0),list);
                     code(getChild(ast,1),list);
                     fprint(fichier, "\t EQUAL \n");
                     break;
-                }else {                             //test d'égalité dans le cas des string
+                }else {                                                                 /*test d'égalité dans le cas des string*/
                     buffer = hash[0];
                     while(buffer != NIL(HashMap)){
                         if(strcmp(buffer->nom , ast->u.str)){
@@ -169,32 +169,60 @@ void code(TreeP ast, VarDeclP list) {
                     fprint(fichier, "\t EQUAL \n");
                     break;
                 }
-            case Esup:
+            case Esup:                                                          /*génération code supérieur*/
                 code(getChild(ast,0),list);
                 code(getChild(ast,1),list);
                 fprint(fichier, "\t SUP \n");
                 break;
-            case Einf:
+            case Einf:                                                          /*génération code inférieur*/
                 code(getChild(ast,0),list);
                 code(getChild(ast,1),list);
                 fprint(fichier, "\t INF \n");
                 break;
-            case Einfeq:
+            case Einfeq:                                                        /*génération code inférieur ou égale*/
                 code(getChild(ast,0),list);
                 code(getChild(ast,1),list);
                 fprint(fichier, "\t SUPEQ \n");
                 break;
-            case Esupeq:
+            case Esupeq:                                                        /*génération code supérieur ou égale*/
                 code(getChild(ast,0),list);
                 code(getChild(ast,1),list);
                 fprint(fichier, "\t INFEQ \n");
                 break;
-            case Evide:
+            case Evide:                                                         /*génération code vide*/
                 fprint(fichier,  "\t NOP \n");
+            case Econcat:                                                       /*génération code concatenation*/
+                buffer = hash[0];
+                while(buffer != NIL(HashMap)){
+                    if(strcmp(buffer->nom , ast->u.str)){
+                        break;
+                    }
+                    buffer = buffer->next;
+                }
+                fprintf(fichier, "\t LOAD %s \n", buffer->addr);
+
+                buffer2 = hash[0];
+                while(buffer2 != NIL(HashMap)){
+                    if(strcmp(buffer2->nom , ast->u.str)){
+                        break;
+                    }
+                    buffer2 = buffer2->next;
+                }
+                fprintf(fichier, "\t LOAD %s \n", buffer2->addr);
+                fprint(fichier, "\t CONCAT \n");
+                break;
+            case Ebloc:
+                code(getChild(ast,0)->u.var,getChild(ast,1));
+
+                //TODO récupérer "findelisteP"
 		}
     }
 }
 
-/*TODO faire la génération de code des classes en prenant en compte les différents ALLOC*/
+/*TODO faire la génération de code des classes / constructeurs / méthodes en prenant en compte les différents ALLOC*/
 /*Enew : alloue espace mémoire pour une classe*/
 /*Emethode : alloue espace mémoire pour une méthode*/
+/*Eselect*/
+/*Eselect*/
+
+
