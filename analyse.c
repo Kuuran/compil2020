@@ -216,9 +216,7 @@ enum _t typage(TreeP T, VarDeclP listdecl){
 
 		default : return FALSE; break;
 	}
-TreeP x;
-TreeP y;
-Bool a = x==y;
+
 }
 
 /************* le trucs du tp du prof TODO faudra voir si c'est utile*/
