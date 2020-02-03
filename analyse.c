@@ -10,7 +10,7 @@
 
 
 MethodeP makeMethode(char* n, char* l, Bool ovrd, Bool stk, Bool cstr, VarDeclP p, TypeP tr, TreeP c)
-{/*TODO c'est nul, a refaire*/
+{/*TODO fonction a ameliorer*/
   MethodeP result = NEW(1, Methode);
   result->name = strdup(n);
   result->label = strdup(l);
@@ -20,7 +20,7 @@ MethodeP makeMethode(char* n, char* l, Bool ovrd, Bool stk, Bool cstr, VarDeclP 
 
   result->typeRetour = tr;
 
-  result->next = NIL(Methode); /*il faut un env de methodes (a vider une fois qu'on a cree la classe*/
+  result->next = NIL(Methode); 
 
   result->ovrd = ovrd;
   result->stk = stk;
@@ -121,7 +121,7 @@ VarDeclP makeVar(char *name, char *type, enum e elmt){
 
 Bool analyseSem(TreeP T){
 	if(!(T == NIL(Tree))){
-		/*TODO rajouter les declarations de classes, pour l'instant onne traite que les blocs*/
+		/*TODO rajouter les declarations de classes, pour l'instant on ne traite que les blocs*/
 
 		if(!analyseBloc(T)){
 			/*TODO erreur?*/
@@ -142,7 +142,7 @@ Bool analyseBloc(TreeP T){
 	return TRUE;
 }
 
-/*TODO blocs imbriques*/
+/*TODO traitement des blocs imbriques non implemente*/
 Bool portee(TreeP listinst, VarDeclP listdecl){
 	int i = 0;
 	
@@ -226,7 +226,7 @@ enum _t typage(TreeP T, VarDeclP listdecl){
 /*TODO verification des appels de fonction (parametres, type de retour, ...
 TODO verification du bon usage de this/super*/
 
-/************* le trucs du tp du prof TODO faudra voir si c'est utile*/
+
 extern int yyparse();
 extern int yylineno;
 
@@ -350,8 +350,6 @@ void code(TreeP ast, VarDeclP list) {
 				break;
             case Eaddu:                                                             /*génération code itération ++*/
                 code(getChild(ast,0),NIL(VarDecl));
-                fprintf(fichier, "\t PUSHI %d \n", 1);
-                fprintf(fichier, "\t ADD \n");
                 break;
             case Eminus:                                                            /*génération code soustraction*/
 				code(getChild(ast,0), NIL(VarDecl));
@@ -359,8 +357,8 @@ void code(TreeP ast, VarDeclP list) {
 				fprintf(fichier, "\t SUB \n");
 				break;
             case Eminusu:                                                           /*génération code itération -- */
+		fprintf(fichier, "\t PUSHI %d \n", 0);
                 code(getChild(ast,0),NIL(VarDecl));
-                fprintf(fichier, "\t PUSHI %d \n", 1);
                 fprintf(fichier, "\t SUB \n");
                 break;
 			case Emult:                                                             /*génération code multiplication*/

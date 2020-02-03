@@ -33,4 +33,4 @@ test_lex.o : test_lex.c analyse.h analyse_y.h
 .Phony: clean
 
 clean:
-	rm -f *~ analyse.exe* ./analyse *.o analyse_l.o analyse_y.* test_lex analyse_y.output analyse_l.c
+	rm -f *~ analyse.exe* ./analyse *.o analyse_l.o analyse_y.* test_lex analyse_y.output analyse_l.c out.txt

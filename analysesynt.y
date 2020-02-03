@@ -104,10 +104,6 @@ extern bool erreurlex;
 
 %%
 
-//PAS DE CLASSES POUR LE MOMENT
-
-
-
 axiome:		%empty{$$ = makeTree(Evide, 0);}
 		|	
 		listclasse bloc {}
@@ -303,65 +299,5 @@ listinstructionsOpt:	instruction listinstructionsOpt{$$ = makeTree(Elist, 2, $1,
 listinstructions:       instruction listinstructionsOpt{$$ = makeTree(Elist, 2, $1, $2);};
 
 %%
-
-/*int main(void){
- 
-        printf("Debut de l'analyse syntaxique :\n");
-        yyparse();
-        printf("Fin de l'analyse !\n");
-        printf("Resultat :\n");
-        if(erreurlex){
-                printf("\t-- Echec : Certains lexemes ne font pas partie du lexique du langage ! --\n");
-                printf("\t-- Echec a l'analyse lexicale --\n");
-        }
-        else{
-                printf("\t-- Succes a l'analyse lexicale ! --\n");
-        }
-        if(erreursyntx){
-                printf("\t-- Echec : Certaines phrases sont syntaxiquement incorrectes ! --\n");
-                printf("\t-- Echec a l'analyse syntaxique --\n");
-        }
-        else{
-                printf("\t-- Succes a l'analyse syntaxique ! --\n");
-		bool error_semantical=true;
-                if(error_semantical){
-                        printf("\t-- Echec : Certaines phrases sont semantiquement incorrectes ! --\n");
-                        printf("\t-- Echec a l'analyse semantique --\n");
-                }
-                else{
-                        printf("\t-- Succes a l'analyse semantique ! --\n");
-                }
-        }
-
-        return EXIT_SUCCESS;
-}*/
-/*void yyerror(char *s) {
-	erreursyntx=true;
-        fprintf(stderr, "Erreur de syntaxe a la ligne %d: %s\n", lineno, s);
-}*/
-		
-
-
-			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
 
 

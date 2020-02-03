@@ -138,8 +138,8 @@ typedef struct _Class
 } Class, *ClassP;
 
 typedef struct _Methode
-{ char *name; /* pas util pour la gen de code*/
-  char *label; /* label de debut de fct*/
+{ char *name; 
+  char *label; /* label de debut de fonction*/
   Bool ovrd;
   Bool stk;
   Bool cstr;
