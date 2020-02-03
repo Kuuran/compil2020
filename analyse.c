@@ -44,7 +44,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m)
    int i = 1;
    VarDeclP tmpList = listeClasses;
    while(i){
-     if(!strcmp(tmpList->val->u.classe->name, sc) == 0){
+     if(strcmp(tmpList->val->u.classe->name, sc) == 0){
         result->superClasse = tmpList->val->u.classe;
         i = 0;
      }
@@ -72,7 +72,7 @@ ClassP makeClass(char *n, VarDeclP param, VarDeclP ch, char* sc, MethodeP m)
     VarDeclP tmpList = listeClasses;
     int i = 1;
     while(i){
-      if(!strcmp(tmpList->val->u.classe->name, result->name) == 0){
+      if(strcmp(tmpList->val->u.classe->name, result->name) == 0){
         tmpList->val->u.classe = result;
       }
       tmpList = tmpList->next;
@@ -123,7 +123,7 @@ Bool analyseSem(TreeP T){
 	if(!(T == NIL(Tree))){
 		/*TODO rajouter les declarations de classes, pour l'instant onne traite que les blocs*/
 
-		if(!analyseBloc(((TreeP)getChild(T, 1)))){
+		if(!analyseBloc(T)){
 			/*TODO erreur?*/
 		}
 	}
@@ -142,6 +142,7 @@ Bool analyseBloc(TreeP T){
 	return TRUE;
 }
 
+/*TODO blocs imbriques*/
 Bool portee(TreeP listinst, VarDeclP listdecl){
 	int i = 0;
 	
@@ -165,15 +166,18 @@ Bool contient(VarDeclP listdecl, char* name){
 	VarDeclP tmp = listdecl;
 
 	while(!fin){
-		if(!strcmp(tmp->name, name) == 0){return TRUE;}
-		else if (!(tmp->next == ((VarDeclP)NIL(VarDecl)))) {tmp = tmp->next;}
+		if(strcmp(tmp->name, name) == 0){return TRUE;}
+		else if (tmp->next != NIL(VarDecl)) {
+			tmp = tmp->next;
+		}
 		else {fin = TRUE;}
 	}
 	return FALSE;
 }
 
-
+/*TODO il faut rajouter la gestion des types crees par l'utilisateur*/
 enum _t typage(TreeP T, VarDeclP listdecl){
+
 	switch(T->op){
 		case Eadd : case Eminus : case Emult : case Ediv : case Esup: case Esupeq : case  Einf: case Einfeq : {
 			if((typage(getChild(T, 0), listdecl) == INTEGER) && (typage(getChild(T, 1), listdecl) == INTEGER)){
@@ -219,6 +223,9 @@ enum _t typage(TreeP T, VarDeclP listdecl){
 
 }
 
+/*TODO verification des appels de fonction (parametres, type de retour, ...
+TODO verification du bon usage de this/super*/
+
 /************* le trucs du tp du prof TODO faudra voir si c'est utile*/
 extern int yyparse();
 extern int yylineno;
@@ -254,6 +261,236 @@ void setError(int code) {
   errorCode = code;
   if (code != NO_ERROR) { noEval = TRUE; }
 }
+
+
+/*fonctions de generation de code*/
+
+
+void debut_code() {
+    fprintf(fichier, "-- Ce fichier est généré par le compilateur -- \n\n");
+    fprintf(fichier, "\t START \n");
+}
+
+void fin_code() {
+    fprintf(fichier, "\t STOP \n");
+}
+
+void code(TreeP ast, VarDeclP list) {
+
+    HashMapP buffer = hash[lastdecl];
+    VarDeclP bufList = list;
+
+    while(bufList != (VarDeclP)NIL(VarDeclP)){
+        buffer->addr = lastdecl;
+	buffer->nom = NEW(1, char);
+        strcpy(buffer->nom, bufList->name);
+        fprintf(fichier,"\t ALLOC %d \n", 1);
+        lastdecl++;
+        buffer->next = NEW(1, HashMap);
+        buffer = buffer->next;
+        bufList = bufList->next;
+    }
+
+
+        switch(ast->op) { /* On switch à partir de l'étiquette de l'AST ?*/
+			case AXIOME:                                                             /*génération code axiome*/
+				if(getChild(ast,0)->op == Evide){                                      /*cas ou axiome vide*/
+                    			fprintf(fichier,"\t NOP \n" );
+				}
+				else if(getChild(ast,0)->op == Ebloc){                                 /*cas ou juste un bloc*/
+                    			code(getChild(ast,0),NIL(VarDecl));
+                		}else{                                                                 /*cas ou on a une liste de classe suivi d'un bloc*/
+                    code(getChild(ast,0),NIL(VarDecl));
+                	}
+				break;
+/*génération code if then else*/
+			case Eite:
+				code(getChild(ast,0),NIL(VarDecl));
+				int l = newLabel();
+				int l1 = newLabel();
+				fprintf(fichier, "\t JZ else%d \n", l);  /*else = label rentre dans le else*/
+				code(getChild(ast,1),NIL(VarDecl));
+				fprintf(fichier, "\t JUMP fin%d \n", l1);  /*fin = label fin instruction*/
+				fprintf(fichier, "\t else%d: NOP \n", l);
+				code(getChild(ast,2),NIL(VarDecl));
+				fprintf(fichier, "\t fin%d: NOP \n", l1);
+				break;
+			case Eidvar:                                                            /*génération code : récupère élément en mémoire*/
+			    buffer = hash[0];
+			    while(buffer != NIL(HashMap)){
+			        if(strcmp(buffer->nom , ast->u.str) == 0){
+			            break;
+			        }
+			        buffer = buffer->next;
+			    }
+				fprintf(fichier, "\t PUSHG %d \n", buffer->addr);
+				break;
+			case Econst:                                                            /*génération code déclaration constante*/
+				fprintf(fichier, "\t PUSHI %d \n", ast->u.val);
+				break;
+			case Estr:                                                              /*génération code déclaration string*/
+				fprintf(fichier, "\t PUSHS %s \n", ast->u.str);
+				break;
+			case Eaff:                                                              /*génération code affectation*/
+				buffer = hash[0];
+				while(buffer != NIL(HashMap)){
+					if(strcmp(buffer->nom, getChild(ast,0)->u.str) == 0){
+						break;
+					}
+					buffer = buffer->next;
+				}
+				code(getChild(ast,0), NIL(VarDecl));
+				code(getChild(ast,1),NIL(VarDecl));
+				fprintf(fichier, "\t STOREG %d \n", buffer->addr);
+				break;
+			case Eadd:                                                              /*génération code addition*/
+				code(getChild(ast,0), NIL(VarDecl));
+				code(getChild(ast,1), NIL(VarDecl));
+				fprintf(fichier, "\t ADD \n");
+				break;
+            case Eaddu:                                                             /*génération code itération ++*/
+                code(getChild(ast,0),NIL(VarDecl));
+                fprintf(fichier, "\t PUSHI %d \n", 1);
+                fprintf(fichier, "\t ADD \n");
+                break;
+            case Eminus:                                                            /*génération code soustraction*/
+				code(getChild(ast,0), NIL(VarDecl));
+				code(getChild(ast,1), NIL(VarDecl));
+				fprintf(fichier, "\t SUB \n");
+				break;
+            case Eminusu:                                                           /*génération code itération -- */
+                code(getChild(ast,0),NIL(VarDecl));
+                fprintf(fichier, "\t PUSHI %d \n", 1);
+                fprintf(fichier, "\t SUB \n");
+                break;
+			case Emult:                                                             /*génération code multiplication*/
+				code(getChild(ast,0), NIL(VarDecl));
+				code(getChild(ast,1), NIL(VarDecl));
+				fprintf(fichier, "\t MUL \n");
+				break;
+			case Ediv:                                                              /*génération code division*/
+				code(getChild(ast,0), NIL(VarDecl));
+				code(getChild(ast,1), NIL(VarDecl));
+				fprintf(fichier, "\t DIV \n");
+				break;
+			case Eneq:                                                              /*génération code inégalité*/
+				if(typage(ast, NIL(VarDecl)) == INTEGER){                                             /*test d'égalité dans le cas des integer*/
+                    code(getChild(ast,0),NIL(VarDecl));
+                    code(getChild(ast,1),NIL(VarDecl));
+                    fprintf(fichier, "\t EQUAL \n");
+                    fprintf(fichier, "\t NOT \n");
+                    break;
+                }else {                                                                 /*test d'égalité dans le cas des string*/
+                    buffer = hash[0];
+                    while(buffer != NIL(HashMap)){
+                        if(strcmp(buffer->nom , ast->u.str) == 0){
+                            break;
+                        }
+                        buffer = buffer->next;
+                    }
+                    fprintf(fichier, "\t LOAD %d \n", buffer->addr);
+
+                    HashMapP buffer2 = hash[0];
+                    while(buffer2 != NIL(HashMap)){
+                        if(strcmp(buffer2->nom , ast->u.str) == 0){
+                            break;
+                        }
+                        buffer2 = buffer2->next;
+                    }
+                    fprintf(fichier, "\t LOAD %d \n", buffer2->addr);
+                    fprintf(fichier, "\t EQUAL \n");
+                    fprintf(fichier, "\t NOT \n");
+                    break;
+				}
+            case Eeq:                                                              /*génération code égalité*/
+                if(typage(ast,list) == INTEGER){                                        /*test d'égalité dans le cas des integer*/
+                    code(getChild(ast,0),NIL(VarDecl));
+                    code(getChild(ast,1),NIL(VarDecl));
+                    fprintf(fichier, "\t EQUAL \n");
+                    break;
+                }else {                                                                 /*test d'égalité dans le cas des string*/
+                    buffer = hash[0];
+                    while(buffer != NIL(HashMap)){
+                        if(strcmp(buffer->nom , ast->u.str) == 0){
+                            break;
+                        }
+                        buffer = buffer->next;
+                    }
+                    fprintf(fichier, "\t LOAD %d \n", buffer->addr);
+
+                    HashMapP buffer2 = hash[0];
+                    while(buffer2 != NIL(HashMap)){
+                        if(strcmp(buffer2->nom , ast->u.str) == 0){
+                            break;
+                        }
+                        buffer2 = buffer2->next;
+                    }
+                    fprintf(fichier, "\t LOAD %d \n", buffer2->addr);
+                    fprintf(fichier, "\t EQUAL \n");
+                    break;
+                }
+            case Esup:                                                          /*génération code supérieur*/
+                code(getChild(ast,0),NIL(VarDecl));
+                code(getChild(ast,1),NIL(VarDecl));
+                fprintf(fichier, "\t SUP \n");
+                break;
+            case Einf:                                                          /*génération code inférieur*/
+                code(getChild(ast,0),NIL(VarDecl));
+                code(getChild(ast,1),NIL(VarDecl));
+                fprintf(fichier, "\t INF \n");
+                break;
+            case Einfeq:                                                        /*génération code inférieur ou égale*/
+                code(getChild(ast,0),NIL(VarDecl));
+                code(getChild(ast,1),NIL(VarDecl));
+                fprintf(fichier, "\t SUPEQ \n");
+                break;
+            case Esupeq:                                                        /*génération code supérieur ou égale*/
+                code(getChild(ast,0),NIL(VarDecl));
+                code(getChild(ast,1),NIL(VarDecl));
+                fprintf(fichier, "\t INFEQ \n");
+                break;
+            case Evide:                                                         /*génération code vide*/
+                fprintf(fichier,  "\t NOP \n");
+		break;
+            case Econcat:                                                       /*génération code concatenation*/
+                buffer = hash[0];
+                while(buffer != NIL(HashMap)){
+                    if(strcmp(buffer->nom , ast->u.str) == 0){
+                        break;
+                    }
+                    buffer = buffer->next;
+                }
+                fprintf(fichier, "\t LOAD %d \n", buffer->addr);
+
+                HashMapP buffer2 = hash[0];
+                while(buffer2 != NIL(HashMap)){
+                    if(strcmp(buffer2->nom , ast->u.str) == 0){
+                        break;
+                    }
+                    buffer2 = buffer2->next;
+                }
+                fprintf(fichier, "\t LOAD %d \n", buffer2->addr);
+                fprintf(fichier, "\t CONCAT \n");
+                break;
+            case Ebloc:
+                code(getChild(ast,1), getChild(ast,0)->u.var);
+		break;
+	    case Elist :
+		code(getChild(ast, 0), NIL(VarDecl));
+		code(getChild(ast, 1), NIL(VarDecl));
+		break;
+	    default :
+		printf("code non pris en compte par le compilateur");
+		break;
+    }
+		
+}
+
+int newLabel(){
+	return lastLabel++;
+}
+
+
 
 
 /* Appel:
@@ -299,6 +536,14 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Error: extra argument: %s\n", argv[i]);
     exit(USAGE_ERROR);
   }
+
+  /*on initialise la map des declarations pour la generation de code*/
+  hash = NEW(1, HashMapP);
+  hash[0] = NEW(1, HashMap); 
+  lastdecl = 0;
+  lastLabel = 0;
+
+  fichier = fopen("out.txt", "w");
 
   /* Lance l'analyse syntaxique de tout le source, qui appelle yylex au fur
    * et a mesure. Execute les actions semantiques en parallele avec les

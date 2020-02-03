@@ -7,6 +7,7 @@ int yylex(void);
 void yyerror(char*);
 
 extern char *strdup(const char *s);
+extern char *strcpy(char *S,const char *s);
 
 /* deux macros pratiques, utilisees dans les allocations de structure
  * Pour NEW on donne le nombre et le type de la stucture a allouer (pas le type
@@ -163,6 +164,22 @@ typedef union
 } YYSTYPE;
 
 
+/*hashmap utilisee pour stocker la liste des declarations relatives a un bloc*/
+typedef struct _HashMap {
+    int addr;
+    char *nom;
+    struct _HashMap *next;
+}HashMap, *HashMapP;
+
+HashMapP *hash; /*on cree une liste de pointeurs sur HashMapP afin de pouvoir acceder a la fin de la liste facilement pour y rajouter des elements si on doit l'etendre*/
+
+int lastdecl; /*indice de la derniere map de la liste*/
+
+/*fichier contenant le code de la machine virtuelle*/
+FILE *fichier;
+
+
+
 /* necessaire sinon par defaut Bison definit YYSTYPE comme int ! */
 #define YYSTYPE YYSTYPE
 
@@ -208,12 +225,14 @@ Bool contient(VarDeclP listdecl, char* name);
 /*Typage d'une expression*/
 enum _t typage(TreeP T, VarDeclP listdecl);
 
-/**/
+/*generation de code*/
 
+void debut_code();
+void fin_code();
+void code(TreeP ast, VarDeclP list);
 
-
-
-
+int newLabel();
+int lastLabel;
 
 
 
